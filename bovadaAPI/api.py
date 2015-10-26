@@ -13,7 +13,6 @@ class BovadaApi(object):
 		return super(BovadaApi, self).__init__(*args, **kwargs)
 
 
-	@property
 	def authenticate(self, username, password):
 		pass
 
