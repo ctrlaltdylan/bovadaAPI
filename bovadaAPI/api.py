@@ -1,3 +1,4 @@
+from auth import login_to_bovada
 from ghost import Ghost
 from .error import BovadaException
 from .decorators import authentication_required
@@ -14,7 +15,7 @@ class BovadaApi(object):
 
 
 	def authenticate(self, username, password):
-		pass
+		return auth.login_to_bovada(session=self.start_session(), username=username, password=password)
 
 	
 	@authentication_required
@@ -49,11 +50,13 @@ class BovadaApi(object):
 	def get_all_rugby_matches(self):
 		pass
 
-	def start_session(self, authenticated_session=False):
-		if authenticated_session == False:
-			with self.driver.start() as session:
-				page, resources = session.open("http://bovada.lv")
-				assert page.http_status == 200 and "bovada" in page.content
+	def start_session(self):
+		with self.driver.start() as session:
+			page, resources = session.open("http://bovada.lv")
+			return (
+				("page", page), 
+				("resources", resources),
+			)
 
 
 
