@@ -15,7 +15,7 @@ class BovadaApi(object):
 
 
 	def authenticate(self, username, password):
-		return auth.login_to_bovada(session=self.start_session(), username=username, password=password)
+		return login_to_bovada(session=self.start_session(), username=username, password=password)
 
 	
 	@authentication_required
@@ -53,10 +53,7 @@ class BovadaApi(object):
 	def start_session(self):
 		with self.driver.start() as session:
 			page, resources = session.open("http://bovada.lv")
-			return (
-				("page", page), 
-				("resources", resources),
-			)
+			return page, resources
 
 
 
