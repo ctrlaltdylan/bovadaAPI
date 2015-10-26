@@ -1,0 +1,4 @@
+Django==1.8.5
+Ghost.py==0.2.3
+six==1.10.0
+wheel==0.24.0
