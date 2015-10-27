@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bovadaAPI'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,6 +82,9 @@ DATABASES = {
     }
 }
 
+
+BOVADA_USERNAME = os.environ.get("BOVADA_USERNAME", None)
+BOVADA_PASSWORD = os.environ.get("BOVADA_PASSWORD", None)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
