@@ -1,3 +1,4 @@
+from django.conf import settings
 from error import BovadaException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
