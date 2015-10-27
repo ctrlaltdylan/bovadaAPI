@@ -32,31 +32,37 @@ class BovadaApi(object):
 	@authentication_required
 	@property
 	def bet_history(self):
-		self.current_url = "http://bovada.lv/https://www.bovada.lv/?pushdown=bet-history"
+		self.current_url = "https://www.bovada.lv/?pushdown=bet-history"
 		return bind_api(action="bet_history")
 
 	@authentication_required
 	@property
 	def open_bets(self):
-		self.current_url = "http://bovada.lv/https://www.bovada.lv/?pushdown=bet-history"
+		self.current_url = "https://www.bovada.lv/?pushdown=bet-history"
 		return bind_api(action="open_bets")
 
 	@authentication_recommended
 	@property
 	def soccer_matches(self):
-		self.current_url = "http://sports.bovada.lv/soccer"
+		self.current_url = "https://sports.bovada.lv/soccer"
 		return bind_api(action="soccer_matches")
 
+	@authentication_recommended
 	@property
 	def basketball_matches(self):
+		self.current_url = "https://sports.bovada.lv/basketball"
 		return bind_api(action="basketball_matches")
-
+	
+	@authentication_recommended
 	@property
 	def tennis_matches(self):
+		self.current_url = "https://sports.bovada.lv/tennis"
 		return bind_api(action="tennis_matches")
 
+	@authentication_recommended
 	@property
 	def rugby_matches(self):
+		self.current_url = "https://sports.bovada.lv/rugby"
 		return bind_api(action="rugby_matches")
 
 	
