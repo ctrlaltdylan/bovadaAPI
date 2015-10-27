@@ -12,19 +12,16 @@ class BovadaApi(object):
 		self.authentication = authentication
 		self.driver = Firefox()
 		self.current_url = "https://bovada.lv"
-		self.driver.get(self.current_url)
 		return super(BovadaApi, self).__init__(*args, **kwargs)
 
 
-	def authenticate(self, username=None, password=None):
+	def authenticate(self):
 		try:
 			logged_in = login_to_bovada(self)
 		except Exception, e:
 			print e
 
 		
-
-
 	
 	@authentication_required
 	@property
@@ -62,6 +59,6 @@ class BovadaApi(object):
 	def rugby_matches(self):
 		return bind_api(action="rugby_matches")
 
-
+	
 
 
