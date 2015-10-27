@@ -21,6 +21,10 @@ class BovadaApi(object):
 		except Exception, e:
 			print e
 
+		else:
+			self.authentication = True
+		return logged_in
+
 		
 	
 	@authentication_required
