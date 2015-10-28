@@ -40,3 +40,4 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.DS_Store
