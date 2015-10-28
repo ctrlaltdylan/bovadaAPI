@@ -19,8 +19,8 @@ import datetime
 
 class BovadaApi(object):
 
-	def __init__(self, auth=None, *args, **kwargs):
-		self.auth = auth
+	def __init__(self, *args, **kwargs):
+		self.auth = None
 		return super(BovadaApi, self).__init__(*args, **kwargs)
 
 	@cached_property
