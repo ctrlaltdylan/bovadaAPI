@@ -1,47 +1,33 @@
 from django.conf import settings
-from error import BovadaException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
-from selenium.webdriver.common.keys import Keys
-from .decorators import bovada_api
+from error import BovadaException, BovadaAuthenticationError
+from was_successful import was_successful
+from headers import get_bovada_headers_generic
+import requests
+import json
 import time
 
 
-@bovada_api
-def login_to_bovada(driver, *args, **kwargs):
-	login_button = WebDriverWait(driver, 10).until(
-		EC.presence_of_element_located(
-			(By.ID, "header-login-button")
-			)
-		)
-	login_button.click()
-	username_input = WebDriverWait(driver, 10).until(
-		EC.presence_of_element_located(
-			(By.ID, "login-username")
-			)
-		)
-	password_input = driver.find_element_by_id("login-password")
-	username_input.click()
-	username_input.send_keys(settings.BOVADA_USERNAME)
-	password_input.click()
-	password_input.send_keys(settings.BOVADA_PASSWORD)
-	submit_button = driver.find_element_by_id("login-submit")
-	submit_button.click()
-	try:
-		error_message = WebDriverWait(driver, 10).until(
-			EC.presence_of_element_located(
-				(By.ID, 'loginForm-error-message'))
-		)
-	except:
-		login_successful = True
-
+def login_to_bovada():
+	query_1 = query_login_endpoint() #query the login endpoint like we would if using a browser
+	if was_successful(query_1):
+		query_2 = bovada_auth()
+		if was_successful(query_2):
+			return query_2
+		else:
+			raise BovadaAuthenticationError(query_2.reason)
 	else:
-		login_successful = False
-		raise BovadaAuthenticationError(error_message.text)
+		raise BovadaException(query_1.reason)
 
-	if login_successful:
-		return True
-	return driver
+
+
+def query_login_endpoint():
+	return requests.get("https://www.bovada.lv/websites/services/components/login")
 	
 
+def bovada_auth():
+	payload = json.dumps({
+		"username": settings.BOVADA_USERNAME, 
+		"password":settings.BOVADA_PASSWORD})
+	return requests.post("https://www.bovada.lv/services/web/v2/oauth/token", 
+		data=payload, 
+		headers=get_bovada_headers_generic())
