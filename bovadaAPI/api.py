@@ -1,3 +1,10 @@
+#Created By: Jon Kolman
+#version: 1.0
+#description: An API to interact with https://bovada.lv. 
+
+
+
+
 import os
 from django.conf import settings
 from django.utils.functional import cached_property
