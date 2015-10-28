@@ -8,8 +8,8 @@ The easiest way to install is by cloning this repo.
 git clone https://github.com/jkol36/bovadaAPI.git
 
 Then: cd bovadaAPI
-then: pip install -r requirements.txt
-then: add BOVADA_USERNAME and BOVADA_PASSWORD as a environment variable by running export BOVADA_USERNAME="test" export BOVADA_PASSWORD="test"
+  then: pip install -r requirements.txt
+  then: add BOVADA_USERNAME and BOVADA_PASSWORD as a environment variable by running export BOVADA_USERNAME="test" export BOVADA_PASSWORD="test"
 then: import the bovadaAPI
 from bovadaAPI.api import BovadaApi
 
