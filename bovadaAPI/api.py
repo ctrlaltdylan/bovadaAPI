@@ -20,20 +20,20 @@ import datetime
 class BovadaApi(object):
 
 	def __init__(self, *args, **kwargs):
-		self.auth = None
+		self._auth = None
 		return super(BovadaApi, self).__init__(*args, **kwargs)
 
 	@cached_property
-	def authenticate(self):
+	def auth(self):
 		try:
 			response = login_to_bovada()
 		except Exception, e:
 			print e
 		else:
-			self.auth = response.json()
-			self.auth['profile_id'] = response.headers['X-Profile-Id']
-			self.auth['expiration_date'] = self._get_expiration_time(self.auth['expires_in'])
-			return self.auth
+			self._auth = response.json()
+			self._auth['profile_id'] = response.headers['X-Profile-Id']
+			self._auth['expiration_date'] = self._get_expiration_time(self.auth['expires_in'])
+			return self._auth
 		
 
 
