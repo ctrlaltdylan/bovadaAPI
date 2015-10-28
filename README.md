@@ -11,7 +11,7 @@ Then: cd bovadaAPI
 
 then: pip install -r requirements.txt
 
-then: add BOVADA_USERNAME and BOVADA_PASSWORD as a environment variable by running export BOVADA_USERNAME="test" 
+then: add BOVADA_USERNAME and BOVADA_PASSWORD as a environment variables by running export BOVADA_USERNAME="test" 
 
 export BOVADA_PASSWORD="test"
 
