@@ -35,7 +35,7 @@ def bovada_auth():
 		raise BovadaException("Could not find your bovada password. Did you export it as an environment variable?")
 	
 	payload = json.dumps({
-		"username": username 
+		"username": username, 
 		"password":password})
 	return requests.post("https://www.bovada.lv/services/web/v2/oauth/token", 
 		data=payload, 

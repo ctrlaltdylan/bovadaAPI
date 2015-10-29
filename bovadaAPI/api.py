@@ -4,8 +4,8 @@
 import os
 from cached_property import cached_property
 from auth import login_to_bovada
-from .error import BovadaException
-from .decorators import authentication_required, authentication_recommended
+from error import BovadaException
+from decorators import authentication_required, authentication_recommended
 from bind_api import bind_api
 import json
 import datetime

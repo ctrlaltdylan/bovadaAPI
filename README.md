@@ -2,7 +2,7 @@
 Interact with bovada.lv programmatically.
 
 
-INSTALLATION:
+INSTALATION:
 The easiest way to install is by cloning this repo.
 
 git clone https://github.com/jkol36/bovadaAPI.git
@@ -22,7 +22,7 @@ from bovadaAPI.api import BovadaApi
 
 instantiate the api: b = BovadaApi()
 
-authenticate yourself: b.authenticate
+authenticate yourself: b.auth
 
 
 CURRENT_FUNCTIONALITY:

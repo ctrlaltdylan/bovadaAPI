@@ -1,4 +1,4 @@
-from .error import BovadaException
+from error import BovadaException
 import requests
 from was_successful import was_successful
 from headers import get_bovada_headers_generic, get_bovada_headers_authorization
