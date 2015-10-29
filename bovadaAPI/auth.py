@@ -1,4 +1,4 @@
-from django.conf import settings
+import os
 from error import BovadaException, BovadaAuthenticationError
 from was_successful import was_successful
 from headers import get_bovada_headers_generic
@@ -25,9 +25,18 @@ def query_login_endpoint():
 	
 
 def bovada_auth():
+	try:
+		username = os.environ["BOVADA_USERNAME"]
+	except KeyError:
+		raise BovadaException("could not find your bovada username. Did you export it as an environment variable?")
+	try:
+		password = os.environ["BOVADA_PASSWORD"]
+	except KeyError:
+		raise BovadaException("Could not find your bovada password. Did you export it as an environment variable?")
+	
 	payload = json.dumps({
-		"username": settings.BOVADA_USERNAME, 
-		"password":settings.BOVADA_PASSWORD})
+		"username": username 
+		"password":password})
 	return requests.post("https://www.bovada.lv/services/web/v2/oauth/token", 
 		data=payload, 
 		headers=get_bovada_headers_generic())
