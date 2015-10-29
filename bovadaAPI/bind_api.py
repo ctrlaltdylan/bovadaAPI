@@ -9,10 +9,10 @@ from headers import get_bovada_headers_generic, get_bovada_headers_authorization
 
 
 def bind_api(auth_obj, action):
-	profile_id = auth_obj.auth["profile_id"]
-	access_token = auth_obj.auth["access_token"]
-	token_type = auth_obj.auth["token_type"]
-	expiration_date = auth_obj.auth["expiration_date"]
+	profile_id = auth_obj._auth["profile_id"]
+	access_token = auth_obj._auth["access_token"]
+	token_type = auth_obj._auth["token_type"]
+	expiration_date = auth_obj._auth["expiration_date"]
 	if action == "summary":
 		headers = get_bovada_headers_authorization(access_token, token_type)
 	else:

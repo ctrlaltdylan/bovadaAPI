@@ -32,7 +32,7 @@ class BovadaApi(object):
 		else:
 			self._auth = response.json()
 			self._auth['profile_id'] = response.headers['X-Profile-Id']
-			self._auth['expiration_date'] = self._get_expiration_time(self.auth['expires_in'])
+			self._auth['expiration_date'] = self._get_expiration_time(self._auth['expires_in'])
 			return self._auth
 		
 
