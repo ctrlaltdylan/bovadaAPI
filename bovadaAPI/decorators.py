@@ -19,6 +19,7 @@ def authentication_recommended(func):
 	def authentication_reccommended_wrapper(self, *args, **kwargs):
 		if self._auth == None:
 			print "Not authenticating first will mean the odds will be in American Format"
+			return func(self, *args, **kwargs)
 		return func(self, *args, **kwargs)
 	return authentication_reccommended_wrapper
 

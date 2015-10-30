@@ -76,10 +76,22 @@ class BovadaApi(object):
 		return bind_api(self, action="rugby_matches")
 
 	
+	@property
+	@authentication_recommended
+	def baseball_matches(self):
+		return bind_api(self, action="baseball_matches")
 	#generates an expiration time obj by adding the fast_forward amount to the current time
 	def _get_expiration_time(self, fast_forward):
 		pass
 
+	@authentication_required
+	#endpoint = https://sports.bovada.lv/services/sports/bet/betslip/validate
+	def validate_bets(bets, channel, groups, selections):
+		return bind_api(action="validate_bets", *args)
+
+	@authentication_required
+	def place_bets(*args):
+		return bind_api(action="place_bets", *args)
 
 
 
