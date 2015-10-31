@@ -3,11 +3,12 @@ import requests
 from was_successful import was_successful
 from headers import get_bovada_headers_generic, get_bovada_headers_authorization
 from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
+import json
 #from BovadaMatches import SoccerMatches, BasketballMatches, BaseballMatches, TennisMatches, RugbyMatches
 
 all_bmatches = []
-#all_outcome_objects = []
-#all_odds_objects = []
+checked_urls = []
+
 
 
 class BovadaMatch(object):
@@ -73,10 +74,10 @@ def parse_response(response):
 	gamelines = search_dictionary_for_certain_keys("items", center_content)[0] #index 0 is gamelines index 1 is futures
 	for match in gamelines['itemList']['items']:
 		outcome_objects_for_match = []
-		game_sport = str(match['sport'])
+		game_sport = match['sport']
 		game_id = int(match['id'])
-		description = str(match['description'])
-		startTime = str(match['startTime'])
+		description = match['description']
+		startTime = match['startTime']
 		competitors = match['competitors']
 		home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[1])
 		home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
@@ -84,7 +85,7 @@ def parse_response(response):
 		away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
 		away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[0])
 		away_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
-		game_link = "https://sports.bovada.lv{}".format(str(match['link']))
+		game_link = "https://sports.bovada.lv{}".format(match['link'])
 		type_ = match['type']
 		displayGroups= match['displayGroups']
 		for group in displayGroups:
@@ -132,25 +133,29 @@ def parse_response(response):
 	except TypeError:
 		already_parsed_endpoints = []
 
-	# if rel_urls:
-	# 	for url in rel_urls:
-	# 		if url not in already_parsed_endpoints:
-	# 			response = requests.get("https://sports.bovada.lv"+url, headers=get_bovada_headers_generic())
-	# 			if was_successful(response):
-	# 				return parse_response(response.content)
-	# 				try:
-	# 					response_as_json = response.json()
-	# 				except ValueError, e:
-	# 					response_as_json = None
-	# 				else:
-	# 					if response_as_json:
-	# 						return parse_response(response_as_json)
+	if rel_urls:
+		for url in rel_urls:
+			if url not in already_parsed_endpoints and url not in checked_urls:
+				response = requests.get("https://sports.bovada.lv"+url+"?json=true", headers=get_bovada_headers_generic())
+				if was_successful(response):
+					try:
+						response_as_json = response.json()
+					except ValueError, e:
+						print e
+						return fallback(response)
+						response_as_json = None
+					else:
+						if response_as_json:
+							checked_urls.append(url)
+							return parse_response(response_as_json)
 
 
-	# 			else:
-	# 				raise BovadaException("connection to endpoint {} failed".format(url))
-	# else:
-	return all_bmatches
+				else:
+					raise BovadaException("connection to endpoint {} failed".format(url))
+			pass
+		return all_bmatches
+	else:
+		return all_bmatches
 
 
 
@@ -162,6 +167,17 @@ def was_successful(request):
 		return True
 	else:
 		return False
+
+
+def fallback(response):
+	try:
+		response_as_json = json.loads(response.content)
+	except:
+		return "fallback failed"
+	else:
+		return response_as_json
+
+
 
 
 def find_relative_urls(response):
