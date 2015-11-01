@@ -8,7 +8,6 @@ def parse_special_response(response):
 	return response
 
 def parse_response(response):
-	bmatches = []
 	center_content = response['data']['regions']['content_center'] #useful
 	market_lines =  search_dictionary_for_certain_keys("value", [value for value in response['data']['regions']['content_center'].values()][0])#other keys = name, value#returns odds ['json-var']['value']
 	try:
