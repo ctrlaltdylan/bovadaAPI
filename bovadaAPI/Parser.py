@@ -1,6 +1,5 @@
 from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
 
-all_bmatches = []
 
 
 class BovadaMatch(object):
@@ -45,6 +44,7 @@ def parse_special_response(response):
 	return response
 
 def parse_response(response):
+	bmatches = []
 	center_content = response['data']['regions']['content_center'] #useful
 	market_lines =  search_dictionary_for_certain_keys("value", [value for value in response['data']['regions']['content_center'].values()][0])#other keys = name, value#returns odds ['json-var']['value']
 	try:
@@ -104,6 +104,9 @@ def parse_response(response):
 				type=type_,
 				game_id=game_id, 
 				outcomes=outcome_objects_for_match)
-		all_bmatches.append(bmatch)
-	return all_bmatches
+		if bmatch.home_team_full_name not in [x.home_team_full_name for x in bmatches]:
+			bmatches.append(bmatch)
+		else:
+			pass
+	return bmatches
 			

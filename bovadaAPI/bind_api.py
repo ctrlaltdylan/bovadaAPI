@@ -9,45 +9,11 @@ import json
 
 all_urls = []
 response_objects =[]
+all_bmatches = []
 
 
 
-class BovadaMatch(object):
-	def __init__(self, *args, **kwargs):
-		self.sport = kwargs.pop("sport")
-		self.description = kwargs.pop("description")
-		self.startTime = kwargs.pop("startTime")
-		self.home_team_short_name = kwargs.pop("home_team_short_name")
-		self.home_team_full_name = kwargs.pop("home_team_full_name")
-		self.home_team_abbreviation = kwargs.pop("home_team_abbreviation")
-		self.away_team_short_name = kwargs.pop("away_team_shortname")
-		self.away_team_full_name = kwargs.pop("away_team_full_name")
-		self.away_team_abbreviation= kwargs.pop("away_team_abbreviation")
-		self.game_link = kwargs.pop("game_link")
-		self.type = kwargs.pop("type")
-		self.game_id = kwargs.pop("game_id")
-		self.outcomes = kwargs.pop("outcomes")
-		return super(BovadaMatch, self).__init__()
 
-	@property
-	def match_details(self):
-		return "%s, %s, %s, %s, %s, %s, %s, %s" %(self.sport, self.game_link, 
-			self.description, self.startTime, self.home_team_full_name,
-			self.game_link, self.type, self.game_id)
-
-class Odds(object):
-	def __init__(self, *args, **kwargs):
-		self.odds_type = kwargs.pop("odds_type")
-		return super(Odds, self).__init__(*args, **kwargs)
-	
-
-
-class OutCome(object):
-	def __init__(self, *args, **kwargs):
-		self.parent = kwargs.pop("parent")
-		self.name = kwargs.pop("name")
-		self.price = kwargs.pop("price")
-		return super(OutCome, self).__init__(*args, **kwargs)
 
 
 def bind_api(auth_obj, action, *args, **kwargs):
@@ -75,23 +41,11 @@ def bind_api(auth_obj, action, *args, **kwargs):
 			for obj in response_objects:
 				#this is where we actually get the bovada matches on each page
 				bmatches = parse_response(obj)
-				print bmatches
-
-			
-
-			
-
-
-
-
-
-
-def was_successful(request):
-	print "calling was_successful"
-	if request.status_code == 200:
-		return True
-	else:
-		return False
+				if bmatches:
+					for match in bmatches: 
+						if match not in all_bmatches:
+							all_bmatches.append(match)
+			return all_bmatches
 
 
 
