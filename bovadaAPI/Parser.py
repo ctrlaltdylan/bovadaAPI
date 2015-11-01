@@ -46,7 +46,6 @@ def parse_special_response(response):
 def parse_response(response):
 	bmatches = []
 	center_content = response['data']['regions']['content_center'] #useful
-	market_lines =  search_dictionary_for_certain_keys("value", [value for value in response['data']['regions']['content_center'].values()][0])#other keys = name, value#returns odds ['json-var']['value']
 	try:
 		gamelines = search_dictionary_for_certain_keys("items", center_content)[0] #index 0 is gamelines index 1 is futures
 	except IndexError:
