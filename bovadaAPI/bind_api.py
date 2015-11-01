@@ -6,8 +6,8 @@ from search_dictionary_for_certain_keys import search_dictionary_for_certain_key
 import json
 #from BovadaMatches import SoccerMatches, BasketballMatches, BaseballMatches, TennisMatches, RugbyMatches
 
-all_bmatches = []
-checked_urls = []
+all_urls = []
+response_objects =[]
 
 
 
@@ -49,113 +49,32 @@ class OutCome(object):
 		return super(OutCome, self).__init__(*args, **kwargs)
 
 
-def bind_api(auth_obj, action):
+def bind_api(auth_obj, action, *args, **kwargs):
+	try:
+		amount_to_deposit = kwargs.pop("amount")
+	except KeyError:
+		amount_to_deposit = None
+	urls_to_scrape = []
 	profile_id = auth_obj._auth["profile_id"]
 	access_token = auth_obj._auth["access_token"]
 	token_type = auth_obj._auth["token_type"]
 	expiration_date = auth_obj._auth["expiration_date"]
-	if action == "summary":
+	if action == "summary" or action=="wallets" or action=="deposit":
 		headers = get_bovada_headers_authorization(access_token, token_type)
 	else:
 		headers = get_bovada_headers_generic()
 	request = requests.get(get_endpoint(action=action, profile_id=profile_id), headers=headers)
 	if was_successful(request):
-		return parse_response(request.json())
-		
-
-
-
-def parse_response(response):
-	#store our relative urls here. Get these urls and parse their pages after parsing current page.
-	rel_urls = find_relative_urls(response)
-	bmatches = []
-	center_content = response['data']['regions']['content_center'] #useful
-	market_lines =  search_dictionary_for_certain_keys("value", [value for value in response['data']['regions']['content_center'].values()][0])#other keys = name, value#returns odds ['json-var']['value']
-	gamelines = search_dictionary_for_certain_keys("items", center_content)[0] #index 0 is gamelines index 1 is futures
-	for match in gamelines['itemList']['items']:
-		outcome_objects_for_match = []
-		game_sport = match['sport']
-		game_id = int(match['id'])
-		description = match['description']
-		startTime = match['startTime']
-		competitors = match['competitors']
-		home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[1])
-		home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
-		home_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
-		away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
-		away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[0])
-		away_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
-		game_link = "https://sports.bovada.lv{}".format(match['link'])
-		type_ = match['type']
-		displayGroups= match['displayGroups']
-		for group in displayGroups:
-			if group['description'] != "Game Lines":
-				pass
-			else:
-				betting_lines = [x for x in group["itemList"]]
-				for line in betting_lines:
-					odds_type = line['description']
-					outcomes = line['outcomes']
-					odds_obj = Odds(odds_type=odds_type)
-					for outcome in outcomes:
-						name = outcome['description']
-						try:
-							price  = outcome['price']["decimal"]
-						except KeyError:
-							price = None
-						outcome_obj = OutCome(parent=odds_obj, 
-							name=name, 
-							price=price)
-						outcome_objects_for_match.append(outcome_obj)
-
-
-					
-
-		bmatch = BovadaMatch(
-				sport=game_sport,
-				description=description,
-				startTime=startTime,
-				home_team_short_name=home_team_short_name,
-				home_team_full_name = home_team_full_name,
-				home_team_abbreviation = home_team_abbreviation,
-				away_team_shortname = away_team_short_name,
-				away_team_abbreviation = away_team_abbreviation,
-				away_team_full_name = away_team_full_name,
-				game_link=game_link,
-				type=type_,
-				game_id=game_id, 
-				outcomes=outcome_objects_for_match)
-		all_bmatches.append(bmatch)
-		bmatches.append(bmatch)
+		if action == "summary" or action =="wallets" or action=="deposit":
+			return parse_special_response(request)
+		else:
+			query_all_endpoints = find_relative_urls(request)
+			print len(all_urls)
+			print len(response_objects)
 			
-	try:
-		already_parsed_endpoints = [x['link'] for x in market_lines['items']] #no need to query these urls again
-	except TypeError:
-		already_parsed_endpoints = []
 
-	if rel_urls:
-		for url in rel_urls:
-			if url not in already_parsed_endpoints and url not in checked_urls:
-				response = requests.get("https://sports.bovada.lv"+url+"?json=true", headers=get_bovada_headers_generic())
-				if was_successful(response):
-					try:
-						response_as_json = response.json()
-					except ValueError, e:
-						print e
-						return fallback(response)
-						response_as_json = None
-					else:
-						if response_as_json:
-							checked_urls.append(url)
-							return parse_response(response_as_json)
+			
 
-
-				else:
-					raise BovadaException("connection to endpoint {} failed".format(url))
-			pass
-		return all_bmatches
-	else:
-		return all_bmatches
 
 
 
@@ -169,19 +88,36 @@ def was_successful(request):
 		return False
 
 
-def fallback(response):
+
+
+def find_relative_urls(response, index=1):
+	#append the response object to response_objects list so we dont have to make any queries again.
+	response_objects.append(response.json())
+	all_urls.append(response.url)
 	try:
-		response_as_json = json.loads(response.content)
+		url_list = [x['relativeUrl'] for x in response.json()['data']['page']['navigation']['navigation'][index]['items']]
+	except (IndexError, KeyError, TypeError):
+		url_list = None
+		pass
+	if url_list:
+		for url in url_list:
+			page = get_relative_url(url)
+			if page:
+				find_relative_urls(page, index=index+1)
+		return all_urls
+	return all_urls
+
+def get_relative_url(endpoint):
+	URL = "https://sports.bovada.lv{}?json=true".format(endpoint)
+	try:
+		response = requests.get(URL, headers=get_bovada_headers_generic())
 	except:
-		return "fallback failed"
-	else:
-		return response_as_json
-
-
-
-
-def find_relative_urls(response):
-	return [x['relativeUrl'] for x in response['data']['page']['navigation']['navigation'][1]['items']]
+		response = None
+		return response
+	if was_successful(response):
+		#save our response objects in memory so we dont have to query again.
+		response_objects.append(response.json())
+		return response
 def get_endpoint(action, profile_id):
 	if  action == "soccer_matches":
 		endpoint = "https://sports.bovada.lv/soccer?json=true"
@@ -189,7 +125,11 @@ def get_endpoint(action, profile_id):
 	elif action == "summary":
 		 endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/summary" % profile_id
 
+	elif action == "deposit":
+		endpoint = "https://www.bovada.lv/?pushdown=cashier.deposit"
 
+	elif action == "wallets":
+		endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/wallets" % profile_id
 
 	elif action == "basketball_matches":
 		endpoint = "https://sports.bovada.lv/basketball?json=true"
@@ -206,3 +146,4 @@ def get_endpoint(action, profile_id):
 	else:
 		raise BovadaException("did not receive a valid action. Received: {}".format(action))
 	return endpoint
+

@@ -93,5 +93,24 @@ class BovadaApi(object):
 	def place_bets(*args):
 		return bind_api(action="place_bets", *args)
 
+	@authentication_required
+	def deposit(self, amount):
+		return bind_api(self, action="deposit", amount=amount)
+
+	@property
+	@authentication_required
+	def wallet(self):
+		return bind_api(self, action="wallets")
+
+def test():
+	b = BovadaApi()
+	b.auth
+	print b.auth
+	return b.soccer_matches
+
+print test()
+
+
+
 
 
