@@ -108,8 +108,7 @@ def test():
 	print b.auth
 	return b.basketball_matches
 
-for bovada_match in test():
-	print bovada_match.home_team_full_name
+
 
 
 
