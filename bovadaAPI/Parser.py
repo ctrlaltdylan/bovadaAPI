@@ -104,9 +104,8 @@ def parse_response(response):
 				type=type_,
 				game_id=game_id, 
 				outcomes=outcome_objects_for_match)
-		if bmatch.home_team_full_name not in [x.home_team_full_name for x in bmatches]:
-			bmatches.append(bmatch)
-		else:
-			pass
+		
+		bmatches.append(bmatch)
+		
 	return bmatches
 			
