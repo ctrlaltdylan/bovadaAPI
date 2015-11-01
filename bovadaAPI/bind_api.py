@@ -3,6 +3,7 @@ import requests
 from was_successful import was_successful
 from headers import get_bovada_headers_generic, get_bovada_headers_authorization
 from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
+from Parser import parse_response, parse_special_response
 import json
 #from BovadaMatches import SoccerMatches, BasketballMatches, BaseballMatches, TennisMatches, RugbyMatches
 
@@ -71,6 +72,11 @@ def bind_api(auth_obj, action, *args, **kwargs):
 			query_all_endpoints = find_relative_urls(request)
 			print len(all_urls)
 			print len(response_objects)
+			for obj in response_objects:
+				#this is where we actually get the bovada matches on each page
+				bmatches = parse_response(obj)
+				print bmatches
+
 			
 
 			

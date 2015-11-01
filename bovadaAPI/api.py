@@ -106,7 +106,7 @@ def test():
 	b = BovadaApi()
 	b.auth
 	print b.auth
-	return b.soccer_matches
+	return b.basketball_matches
 
 print test()
 
