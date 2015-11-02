@@ -102,6 +102,9 @@ def get_endpoint(action, profile_id, outcomeId=None):
 	elif action == "basketball_matches":
 		endpoint = "https://sports.bovada.lv/basketball?json=true"
 
+	elif action == "football_matches":
+		endpoint = "https://sports.bovada.lv/football?json=true"
+
 	elif action == "tennis_matches":
 		endpoint = "https://sports.bovada.lv/tennis?json=true"
 
