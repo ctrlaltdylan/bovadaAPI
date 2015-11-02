@@ -21,19 +21,25 @@ def bind_api(auth_obj, action, *args, **kwargs):
 		amount_to_deposit = kwargs.pop("amount")
 	except KeyError:
 		amount_to_deposit = None
+	try:
+		outcomeId = kwargs.pop("outcomeId")
+	except KeyError:
+		outcomeId = None
 	urls_to_scrape = []
 	profile_id = auth_obj._auth["profile_id"]
 	access_token = auth_obj._auth["access_token"]
 	token_type = auth_obj._auth["token_type"]
 	expiration_date = auth_obj._auth["expiration_date"]
-	if action == "summary" or action=="wallets" or action=="deposit":
+	if action == "summary" or action=="wallets" or action=="deposit" or action=="place_bets":
 		headers = get_bovada_headers_authorization(access_token, token_type)
 	else:
 		headers = get_bovada_headers_generic()
-	request = requests.get(get_endpoint(action=action, profile_id=profile_id), headers=headers)
+	request = requests.get(get_endpoint(action=action, profile_id=profile_id, outcomeId=outcomeId), headers=headers)
 	if was_successful(request):
 		if action == "summary" or action =="wallets" or action=="deposit":
 			return parse_special_response(request)
+		elif action == "place_bets":
+			return validate_bets(bets, channel, groups, selections)
 		else:
 			query_all_endpoints = find_relative_urls(request)
 			print len(all_urls)
@@ -46,6 +52,8 @@ def bind_api(auth_obj, action, *args, **kwargs):
 						if match not in all_bmatches:
 							all_bmatches.append(match)
 			return all_bmatches
+	else:
+		raise BovadaException(request.reason)
 
 
 
@@ -78,7 +86,7 @@ def get_relative_url(endpoint):
 		#save our response objects in memory so we dont have to query again.
 		response_objects.append(response.json())
 		return response
-def get_endpoint(action, profile_id):
+def get_endpoint(action, profile_id, outcomeId=None):
 	if  action == "soccer_matches":
 		endpoint = "https://sports.bovada.lv/soccer?json=true"
 
@@ -102,6 +110,13 @@ def get_endpoint(action, profile_id):
 
 	elif action == "baseball_matches":
 		endpoint = "https://sports.bovada.lv/baseball?json=true"
+
+	elif action == "place_bets":
+		if not outcomeId:
+			raise BovadaException("can't place a bet without the outcome id")
+		else:
+			#format https://sports.bovada.lv/services/sports/bet/betslip?outcomeId=A:91769724:1&outcomeId=A:91769726:2
+			endpoint = "https://sports.bovada.lv/services/sports/bet/betslip?outcomeId={}"
 	
 	else:
 		raise BovadaException("did not receive a valid action. Received: {}".format(action))

@@ -75,6 +75,11 @@ class BovadaApi(object):
 	def rugby_matches(self):
 		return bind_api(self, action="rugby_matches")
 
+	@property
+	@authentication_recommended
+	def football_matches(self):
+		return bind_api(self, action="football_matches")
+
 	
 	@property
 	@authentication_recommended
@@ -91,6 +96,7 @@ class BovadaApi(object):
 
 	@authentication_required
 	def place_bets(*args):
+		#https://sports.bovada.lv/services/sports/bet/betslip/c7a970f8-37ca-39dd-ab5f-69fb560aea42
 		return bind_api(action="place_bets", *args)
 
 	@authentication_required
