@@ -9,7 +9,6 @@ import json
 
 all_urls = []
 response_objects =[]
-all_bmatches = []
 
 
 
@@ -17,6 +16,12 @@ all_bmatches = []
 
 
 def bind_api(auth_obj, action, *args, **kwargs):
+	soccer_matches = []
+	basketball_matches = []
+	baseball_matches = []
+	tennis_matches = []
+	rugby_matches = []
+	football_matches = []
 	try:
 		amount_to_deposit = kwargs.pop("amount")
 	except KeyError:
@@ -49,9 +54,28 @@ def bind_api(auth_obj, action, *args, **kwargs):
 				bmatches = parse_response(obj)
 				if bmatches:
 					for match in bmatches: 
-						if match not in all_bmatches:
-							all_bmatches.append(match)
-			return all_bmatches
+						if match.sport == "BASK":
+							basketball_matches.append(match)
+
+						elif match.sport == "FOOT":
+							football_matches.append(match)
+
+						elif match.sport == "BASE":
+							basketball_matches.append(match)
+
+						elif match.sport == "TENN":
+							tennis_matches.append(match)
+
+						elif match.sport == "RUGBU":
+							rugby_matches.append(match)
+			return {
+				"basketball_matches": basketball_matches,
+				"baseball_matches": baseball_matches,
+				"rugby_matches": rugby_matches,
+				"football_matches":football_matches,
+				"soccer_matches":socer_matches,
+				"tennis_matches": tennis_matches,
+			}
 	else:
 		raise BovadaException(request.reason)
 

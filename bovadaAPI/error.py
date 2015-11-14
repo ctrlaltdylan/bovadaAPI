@@ -4,7 +4,7 @@ import six
 
 
 
-class BovadaException(Exception):
+class BovadaException(object):
 
 	def __init__(self, reason, response=None):
 		self.reason = six.text_type(reason)
