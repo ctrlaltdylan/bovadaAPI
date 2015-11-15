@@ -49,7 +49,7 @@ def parse_response(response):
 	try:
 		gamelines = search_dictionary_for_certain_keys("items", center_content)[0] #index 0 is gamelines index 1 is futures
 	except IndexError, TypeError:
-		return 
+		return []
 	for match in gamelines['itemList']['items']:
 		outcome_objects_for_match = []
 		game_sport = match['sport']
