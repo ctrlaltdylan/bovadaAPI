@@ -109,6 +109,6 @@ def parse_response(response):
 	return bmatches
 
 def save_bovada_matches(bmatches):
-	with open("bovada_matches.json", "w") as outfile:
+	with open("bmatches.json", "w+") as outfile:
 		json.dumps(bmatches, outfile)
 			

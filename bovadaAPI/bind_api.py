@@ -10,6 +10,7 @@ import json
 
 all_urls = []
 response_objects =[]
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 
@@ -18,7 +19,7 @@ response_objects =[]
 
 def bind_api(auth_obj, action, *args, **kwargs):
 	try:
-		bovada_match_file = os.path.get("bmatches.json")
+		bovada_match_file = os.path.join(BASE_DIR, "bmatches.json")
 	except Exception, e:
 		print e
 		bovada_match_file = None
