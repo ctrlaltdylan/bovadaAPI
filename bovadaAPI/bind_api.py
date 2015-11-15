@@ -1,3 +1,4 @@
+import os
 from error import BovadaException
 import requests
 from was_successful import was_successful
