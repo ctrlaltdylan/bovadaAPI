@@ -1,5 +1,5 @@
 from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
-
+import json
 
 
 class BovadaMatch(object):
@@ -107,4 +107,8 @@ def parse_response(response):
 		bmatches.append(bmatch)
 		
 	return bmatches
+
+def save_bovada_matches(bmatches):
+	with open("bovada_matches.json", "w") as outfile:
+		json.dumps(bmatches, outfile)
 			

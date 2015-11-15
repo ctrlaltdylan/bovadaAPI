@@ -55,33 +55,33 @@ class BovadaApi(object):
 	def open_bets(self):
 		return bind_api(self, action="open_bets")
 
-	@property
+	@cached_property
 	@authentication_recommended
 	def soccer_matches(self):
 		return bind_api(self, action="soccer_matches")['soccer_matches']
 
-	@property
+	@cached_property
 	@authentication_recommended
 	def basketball_matches(self):
 		return bind_api(self, action="basketball_matches")['basketball_matches']
 	
-	@property
+	@cached_property
 	@authentication_recommended
 	def tennis_matches(self):
 		return bind_api(self, action="tennis_matches")['tennis_matches']
 
-	@property
+	@cached_property
 	@authentication_recommended
 	def rugby_matches(self):
 		return bind_api(self, action="rugby_matches")['rugby_matches']
 
-	@property
+	@cached_property
 	@authentication_recommended
 	def football_matches(self):
 		return bind_api(self, action="football_matches")['football_matches']
 
 	
-	@property
+	@cached_property
 	@authentication_recommended
 	def baseball_matches(self):
 		return bind_api(self, action="baseball_matches")['baseball_matches']

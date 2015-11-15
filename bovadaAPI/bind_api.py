@@ -16,6 +16,16 @@ response_objects =[]
 
 
 def bind_api(auth_obj, action, *args, **kwargs):
+	try:
+		bovada_match_file = os.path.get("bmatches.json")
+	except Exception, e:
+		print e
+		bovada_match_file = None
+	if bovada_match_file:
+		print "got a bovada match file"
+		with open(bovada_match_file, 'r') as infile:
+			all_matches = json.loads(infile)
+			print all_matches
 	soccer_matches = []
 	basketball_matches = []
 	baseball_matches = []
@@ -30,6 +40,7 @@ def bind_api(auth_obj, action, *args, **kwargs):
 		outcomeId = kwargs.pop("outcomeId")
 	except KeyError:
 		outcomeId = None
+
 	urls_to_scrape = []
 	profile_id = auth_obj._auth["profile_id"]
 	access_token = auth_obj._auth["access_token"]
