@@ -85,7 +85,7 @@ def bind_api(auth_obj, action, *args, **kwargs):
 				"baseball_matches": baseball_matches,
 				"rugby_matches": rugby_matches,
 				"football_matches":football_matches,
-				"soccer_matches":socer_matches,
+				"soccer_matches":soccer_matches,
 				"tennis_matches": tennis_matches,
 			}
 	else:
