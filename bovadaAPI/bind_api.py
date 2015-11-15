@@ -19,15 +19,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def bind_api(auth_obj, action, *args, **kwargs):
 	try:
-		bovada_match_file = os.path.join(BASE_DIR, "bmatches.json")
-	except Exception, e:
-		print e
-		bovada_match_file = None
-	if bovada_match_file:
-		print "got a bovada match file"
 		with open(bovada_match_file, 'r') as infile:
 			all_matches = json.loads(infile)
 			print all_matches
+	except IOError:
+		pass
+	else:
+		return all_matches.json()
 	soccer_matches = []
 	basketball_matches = []
 	baseball_matches = []
