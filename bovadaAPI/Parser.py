@@ -48,7 +48,7 @@ def parse_response(response):
 	center_content = response['data']['regions']['content_center'] #useful
 	try:
 		gamelines = search_dictionary_for_certain_keys("items", center_content)[0] #index 0 is gamelines index 1 is futures
-	except IndexError:
+	except IndexError, TypeError:
 		return 
 	for match in gamelines['itemList']['items']:
 		outcome_objects_for_match = []
