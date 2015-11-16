@@ -90,6 +90,11 @@ def bind_api(auth_obj, action, *args, **kwargs):
 							if (match.home_team_full_name not in [s.home_team_full_name for s in rugby_matches] and
 								match.away_team_full_name not in [l.away_team_full_name for l in rugby_matches]):
 									rugby_matches.append(match)
+
+						elif match.sport == "SOCC":
+							if (match.home_team_full_name not in [g.home_team_full_name for g in soccer_matches] and
+								match.away_team_full_name not in [v.away_team_full_name for v in soccer_matches]):
+									soccer_matches.append(match)
 			return {
 				"basketball_matches": basketball_matches,
 				"baseball_matches": baseball_matches,
