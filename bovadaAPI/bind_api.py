@@ -67,19 +67,29 @@ def bind_api(auth_obj, action, *args, **kwargs):
 				if bmatches:
 					for match in bmatches: 
 						if match.sport == "BASK":
-							basketball_matches.append(match)
+							if (match.home_team_full_name not in [x.home_team_full_name for x in basketball_matches] and
+								match.away_team_full_name not in [away_team.away_team_full_name for away_team in basketball_matches]):
+									basketball_matches.append(match)
 
 						elif match.sport == "FOOT":
-							football_matches.append(match)
+							if(match.home_team_full_name not in [z.home_team_full_name for z in football_matches] and
+								match.away_team_full_name not in [t.away_team_full_name for t in football_matches]):
+									football_matches.append(match)
 
 						elif match.sport == "BASE":
-							basketball_matches.append(match)
+							if (match.home_team_full_name not in [p.home_team_full_name for p in basketball_matches] and 
+								match.away_team_full_name not in [j.away_team_full_name for j in basketball_matches]):
+									basketball_matches.append(match)
 
 						elif match.sport == "TENN":
-							tennis_matches.append(match)
+							if (match.home_team_full_name not in [n.home_team_full_name for n in tennis_matches] and
+								match.away_team_full_name not in [m.away_team_full_name for m in tennis_matches]):
+									tennis_matches.append(match)
 
 						elif match.sport == "RUGBU":
-							rugby_matches.append(match)
+							if (match.home_team_full_name not in [s.home_team_full_name for s in rugby_matches] and
+								match.away_team_full_name not in [l.away_team_full_name for l in rugby_matches]):
+									rugby_matches.append(match)
 			return {
 				"basketball_matches": basketball_matches,
 				"baseball_matches": baseball_matches,
