@@ -96,7 +96,7 @@ def bind_api(auth_obj, action, *args, **kwargs):
 
 def find_relative_urls(response, index=1):
 	#append the response object to response_objects list so we dont have to make any queries again.
-	if response_object not in response_objects:
+	if response.json() not in response_objects:
 		response_objects.append(response.json())
 	if response.url not in all_urls:
 		all_urls.append(response.url)
