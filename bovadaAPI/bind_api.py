@@ -59,8 +59,8 @@ def bind_api(auth_obj, action, *args, **kwargs):
 			return validate_bets(bets, channel, groups, selections)
 		else:
 			query_all_endpoints = find_relative_urls(request)
-			print len(all_urls)
-			print len(response_objects)
+			print "number of requests {}".format(len(all_urls))
+			print "number of responses {}".format(len(response_objects))
 			for obj in response_objects:
 				#this is where we actually get the bovada matches on each page
 				bmatches = parse_response(obj)
@@ -96,8 +96,10 @@ def bind_api(auth_obj, action, *args, **kwargs):
 
 def find_relative_urls(response, index=1):
 	#append the response object to response_objects list so we dont have to make any queries again.
-	response_objects.append(response.json())
-	all_urls.append(response.url)
+	if response_object not in response_objects:
+		response_objects.append(response.json())
+	if response.url not in all_urls:
+		all_urls.append(response.url)
 	try:
 		url_list = [x['relativeUrl'] for x in response.json()['data']['page']['navigation']['navigation'][index]['items']]
 	except (IndexError, KeyError, TypeError):
