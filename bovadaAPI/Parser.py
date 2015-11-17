@@ -128,9 +128,6 @@ class BovadaMatch(object):
 		return bmatches
 
 
-	@classmethod
-	def create_from_
-
 class OutCome(object):
 	def __init__(self, *args, **kwargs):
 		self.odds_type = kwargs.pop("odds_type")
