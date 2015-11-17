@@ -1,5 +1,6 @@
 from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
 import json
+from error import BovadaException
 
 
 class BovadaMatch(object):
@@ -25,88 +26,124 @@ class BovadaMatch(object):
 			self.description, self.startTime, self.home_team_full_name,
 			self.game_link, self.type, self.game_id)
 
-class Odds(object):
-	def __init__(self, *args, **kwargs):
-		self.odds_type = kwargs.pop("odds_type")
-		return super(Odds, self).__init__(*args, **kwargs)
-	
 
+	@classmethod
+	def bulk_create_from_center_content(cls, center_content):
+		bmatches = []
+		try:
+			gamelines = search_dictionary_for_certain_keys("items", center_content)[0] #index 0 is gamelines index 1 is futures
+		except (IndexError, TypeError):
+			return []
+		for match in gamelines['itemList']['items']:
+			outcome_objects_for_match = []
+			game_sport = match['sport']
+			game_id = int(match['id'])
+			description = match['description']
+			startTime = match['startTime']
+			competitors = match['competitors']
+			home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[1])
+			home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
+			home_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
+			away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
+			away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[0])
+			away_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
+			game_link = "https://sports.bovada.lv{}".format(match['link'])
+			type_ = match['type']
+			displayGroups= match['displayGroups']
+			for group in displayGroups:
+				if group['description'] != "Game Lines":
+					pass
+				else:
+					betting_lines = [x for x in group["itemList"]]
+					for line in betting_lines:
+						outcomes = OutCome.create_from_betting_line(line)
+						for outcome in outcomes:
+							outcome_objects_for_match.append(outcome)
+
+
+						
+
+			bmatch = BovadaMatch(
+					sport=game_sport,
+					description=description,
+					startTime=startTime,
+					home_team_short_name=home_team_short_name,
+					home_team_full_name = home_team_full_name,
+					home_team_abbreviation = home_team_abbreviation,
+					away_team_shortname = away_team_short_name,
+					away_team_abbreviation = away_team_abbreviation,
+					away_team_full_name = away_team_full_name,
+					game_link=game_link,
+					type=type_,
+					game_id=game_id, 
+					outcomes=outcome_objects_for_match)
+			
+			bmatches.append(bmatch)
+			
+		return bmatches
 
 class OutCome(object):
 	def __init__(self, *args, **kwargs):
-		self.parent = kwargs.pop("parent")
+		self.odds_type = kwargs.pop("odds_type")
 		self.name = kwargs.pop("name")
 		self.price = kwargs.pop("price")
+		self.price_id = kwargs.pop("price_id")
+		self.outcome_id = kwargs.pop("outcome_id")
 		return super(OutCome, self).__init__(*args, **kwargs)
+
+	@classmethod
+	def create_from_betting_line(cls, betting_line, *args, **kwargs):
+		outcome_objs = []
+		odds_type = betting_line["description"]
+		outcomes = betting_line["outcomes"]
+		for outcome in outcomes:
+			try:
+				name = outcome["description"]
+			except KeyError, e:
+				name = None
+			try:
+				price = float(outcome["price"]['decimal'])
+			except KeyError, e:
+				price = None
+
+			try:
+				status = outcome['status']
+			except KeyError, e:
+				status = None
+			try:
+				price_id = int(outcome['price']['id'])
+			except KeyError, e:
+				price_id = None
+			try:
+				outcome_id = int(outcome['price']['outcomeId'])
+			except KeyError, e:
+				outcome_id = None
+
+			if status == "OPEN":
+				outcome_objs.append(
+					cls(
+						odds_type=odds_type,
+						name=name,
+						price=price,
+						price_id=price_id,
+						outcome_id=outcome_id,
+
+					)
+				)
+		return outcome_objs
+
+
 
 
 def parse_special_response(response):
 	return response
 
 def parse_response(response):
-	bmatches = []
 	center_content = response['data']['regions']['content_center'] #useful
-	try:
-		gamelines = search_dictionary_for_certain_keys("items", center_content)[0] #index 0 is gamelines index 1 is futures
-	except (IndexError, TypeError):
-		return []
-	for match in gamelines['itemList']['items']:
-		outcome_objects_for_match = []
-		game_sport = match['sport']
-		game_id = int(match['id'])
-		description = match['description']
-		startTime = match['startTime']
-		competitors = match['competitors']
-		home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[1])
-		home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
-		home_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
-		away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
-		away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[0])
-		away_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
-		game_link = "https://sports.bovada.lv{}".format(match['link'])
-		type_ = match['type']
-		displayGroups= match['displayGroups']
-		for group in displayGroups:
-			if group['description'] != "Game Lines":
-				pass
-			else:
-				betting_lines = [x for x in group["itemList"]]
-				for line in betting_lines:
-					odds_type = line['description']
-					outcomes = line['outcomes']
-					odds_obj = Odds(odds_type=odds_type)
-					for outcome in outcomes:
-						name = outcome['description']
-						try:
-							price  = outcome['price']["decimal"]
-						except KeyError:
-							price = None
-						outcome_obj = OutCome(parent=odds_obj, 
-							name=name, 
-							price=price)
-						outcome_objects_for_match.append(outcome_obj)
-
-
-					
-
-		bmatch = BovadaMatch(
-				sport=game_sport,
-				description=description,
-				startTime=startTime,
-				home_team_short_name=home_team_short_name,
-				home_team_full_name = home_team_full_name,
-				home_team_abbreviation = home_team_abbreviation,
-				away_team_shortname = away_team_short_name,
-				away_team_abbreviation = away_team_abbreviation,
-				away_team_full_name = away_team_full_name,
-				game_link=game_link,
-				type=type_,
-				game_id=game_id, 
-				outcomes=outcome_objects_for_match)
-		
-		bmatches.append(bmatch)
-		
+	bmatches = BovadaMatch.bulk_create_from_center_content(center_content)
 	return bmatches
+
+	
 
 def save_bovada_matches(bmatches):
 	with open("bmatches.json", "w+") as outfile:

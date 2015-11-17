@@ -4,7 +4,7 @@
 import os
 from cached_property import cached_property
 from auth import login_to_bovada
-from error import BovadaException
+from error import BovadaException, BovadaAuthenticationError
 from decorators import authentication_required, authentication_recommended
 from bind_api import bind_api
 import json
@@ -23,7 +23,7 @@ class BovadaApi(object):
 		try:
 			response = login_to_bovada()
 		except Exception, e:
-			print e
+			raise BovadaAuthenticationError(e)
 		else:
 			self._auth = response.json()
 			self._auth['profile_id'] = response.headers['X-Profile-Id']
@@ -42,7 +42,6 @@ class BovadaApi(object):
 	@property
 	@authentication_required
 	def balance(self):
-		print "balance called"
 		return bind_api(self, action="balance")
 
 	@property
