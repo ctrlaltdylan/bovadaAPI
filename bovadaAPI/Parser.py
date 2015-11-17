@@ -26,7 +26,52 @@ class BovadaMatch(object):
 			self.description, self.startTime, self.home_team_full_name,
 			self.game_link, self.type, self.game_id)
 
+	@classmethod
+	def create_from_center_content(cls, center_content):
+		match = search_dictionary_for_certain_keys("items", content_center)[0]
+		outcome_objects_for_match = []
+		game_sport = match['sport']
+		game_id = int(match['id'])
+		description = match['description']
+		startTime = match['startTime']
+		competitors = match['competitors']
+		home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[1])
+		home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
+		home_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
+		away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
+		away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[0])
+		away_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
+		game_link = "https://sports.bovada.lv{}".format(match['link'])
+		type_ = match['type']
+		displayGroups= match['displayGroups']
+		for group in displayGroups:
+			if group['description'] != "Game Lines":
+				pass
+			else:
+				betting_lines = [x for x in group["itemList"]]
+				for line in betting_lines:
+					outcomes = OutCome.create_from_betting_line(line)
+					for outcome in outcomes:
+						outcome_objects_for_match.append(outcome)
 
+
+					
+
+		bmatch = BovadaMatch(
+				sport=game_sport,
+				description=description,
+				startTime=startTime,
+				home_team_short_name=home_team_short_name,
+				home_team_full_name = home_team_full_name,
+				home_team_abbreviation = home_team_abbreviation,
+				away_team_shortname = away_team_short_name,
+				away_team_abbreviation = away_team_abbreviation,
+				away_team_full_name = away_team_full_name,
+				game_link=game_link,
+				type=type_,
+				game_id=game_id, 
+				outcomes=outcome_objects_for_match)
+		return bmatch
 	@classmethod
 	def bulk_create_from_center_content(cls, center_content):
 		bmatches = []
@@ -81,6 +126,10 @@ class BovadaMatch(object):
 			bmatches.append(bmatch)
 			
 		return bmatches
+
+
+	@classmethod
+	def create_from_
 
 class OutCome(object):
 	def __init__(self, *args, **kwargs):
