@@ -27,7 +27,7 @@ class BovadaMatch(object):
 			self.game_link, self.type, self.game_id)
 
 	@classmethod
-	def create_from_center_content(cls, center_content):
+	def create_from_center_content(cls, content_center):
 		match = search_dictionary_for_certain_keys("items", content_center)[0]
 		outcome_objects_for_match = []
 		game_sport = match['sport']
