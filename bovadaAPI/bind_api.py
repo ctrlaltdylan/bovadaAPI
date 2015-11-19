@@ -39,7 +39,7 @@ def bind_api(auth_obj, action, *args, **kwargs):
 	token_type = auth_obj._auth["token_type"]
 	expiration_date = auth_obj._auth["expiration_date"]
 	cookies = auth_obj._auth["cookies"]
-	if action == "summary" or action=="wallets" or action=="deposit":
+	if action == "summary" or action=="wallets" or action=="deposit" or action=="balance":
 		headers = get_bovada_headers_authorization(access_token, token_type)
 	else:
 		headers = get_bovada_headers_generic()
@@ -47,8 +47,8 @@ def bind_api(auth_obj, action, *args, **kwargs):
 	with requests.Session() as s:
 		request = s.get(get_endpoint(action=action, profile_id=profile_id), headers=headers, cookies=cookies)
 		if was_successful(request):
-			if action == "summary" or action =="wallets" or action=="deposit":
-				return parse_special_response(request)
+			if action == "summary" or action =="wallets" or action=="deposit" or action=="balance":
+				return parse_special_response(request, action=action)
 			else:
 				query_all_endpoints = find_relative_urls(request, session=s)
 				print "number of requests {}".format(len(all_urls))
@@ -139,6 +139,8 @@ def get_endpoint(action, profile_id):
 
 	elif action == "summary":
 		 endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/summary" % profile_id
+	elif action == "balance":
+		endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/summary" % profile_id
 
 
 	elif action == "deposit":

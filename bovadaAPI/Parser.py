@@ -181,7 +181,9 @@ class OutCome(object):
 
 
 
-def parse_special_response(response):
+def parse_special_response(response, action):
+	if action == "balance":
+		return int(search_dictionary_for_certain_keys("availableBalance", response.json())["amount"])
 	return response
 
 def parse_response(response):
