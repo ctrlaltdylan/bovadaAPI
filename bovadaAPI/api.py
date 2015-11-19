@@ -18,7 +18,7 @@ class BovadaApi(object):
 		self._auth = None
 		return super(BovadaApi, self).__init__(*args, **kwargs)
 
-	@cached_property
+	@property
 	def auth(self):
 		try:
 			response = login_to_bovada()
@@ -90,11 +90,11 @@ class BovadaApi(object):
 
 	@authentication_required
 	#endpoint = https://sports.bovada.lv/services/sports/bet/betslip/validate
-	def validate_bets(bets, channel, groups, selections):
-		return bind_api(action="validate_bets", *args)
+	def validate_bets(self, bets):
+		return bind_api(self, action="validate_bets", bets=bets)
 
 	@authentication_required
-	def place_bets(*args):
+	def place_bets(self, *args):
 		#https://sports.bovada.lv/services/sports/bet/betslip/c7a970f8-37ca-39dd-ab5f-69fb560aea42
 		return bind_api(action="place_bets", *args)
 
