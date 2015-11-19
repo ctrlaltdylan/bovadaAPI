@@ -16,7 +16,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 
-
 def bind_api(auth_obj, action, *args, **kwargs):
 	soccer_matches = []
 	basketball_matches = []
@@ -45,69 +44,69 @@ def bind_api(auth_obj, action, *args, **kwargs):
 	else:
 		headers = get_bovada_headers_generic()
 	
-	request = requests.get(get_endpoint(action=action, profile_id=profile_id), headers=headers, cookies=cookies)
-	if was_successful(request):
-		if action == "summary" or action =="wallets" or action=="deposit":
-			return parse_special_response(request)
+	with requests.Session() as s:
+		request = s.get(get_endpoint(action=action, profile_id=profile_id), headers=headers, cookies=cookies)
+		if was_successful(request):
+			if action == "summary" or action =="wallets" or action=="deposit":
+				return parse_special_response(request)
+			else:
+				query_all_endpoints = find_relative_urls(request, session=s)
+				print "number of requests {}".format(len(all_urls))
+				print "number of responses {}".format(len(response_objects))
+				for obj in response_objects:
+					#this is where we actually get the bovada matches on each page
+					bmatches = parse_response(obj)
+					if bmatches:
+						for match in bmatches: 
+							if match.sport == "BASK":
+								if (match.home_team_full_name not in [x.home_team_full_name for x in basketball_matches] and
+									match.away_team_full_name not in [away_team.away_team_full_name for away_team in basketball_matches]):
+										basketball_matches.append(match)
+
+							elif match.sport == "FOOT":
+								if(match.home_team_full_name not in [z.home_team_full_name for z in football_matches] and
+									match.away_team_full_name not in [t.away_team_full_name for t in football_matches]):
+										football_matches.append(match)
+
+							elif match.sport == "BASE":
+								if (match.home_team_full_name not in [p.home_team_full_name for p in basketball_matches] and 
+									match.away_team_full_name not in [j.away_team_full_name for j in basketball_matches]):
+										basketball_matches.append(match)
+
+							elif match.sport == "TENN":
+								if (match.home_team_full_name not in [n.home_team_full_name for n in tennis_matches] and
+									match.away_team_full_name not in [m.away_team_full_name for m in tennis_matches]):
+										tennis_matches.append(match)
+
+							elif match.sport == "RUGBU":
+								if (match.home_team_full_name not in [s.home_team_full_name for s in rugby_matches] and
+									match.away_team_full_name not in [l.away_team_full_name for l in rugby_matches]):
+										rugby_matches.append(match)
+
+							elif match.sport == "SOCC":
+								if (match.home_team_full_name not in [g.home_team_full_name for g in soccer_matches] and
+									match.away_team_full_name not in [v.away_team_full_name for v in soccer_matches]):
+										soccer_matches.append(match)
+				return {
+					"basketball_matches": basketball_matches,
+					"baseball_matches": baseball_matches,
+					"rugby_matches": rugby_matches,
+					"football_matches":football_matches,
+					"soccer_matches":soccer_matches,
+					"tennis_matches": tennis_matches,
+				}
 		else:
-			query_all_endpoints = find_relative_urls(request)
-			print "number of requests {}".format(len(all_urls))
-			print "number of responses {}".format(len(response_objects))
-			for obj in response_objects:
-				#this is where we actually get the bovada matches on each page
-				bmatches = parse_response(obj)
-				if bmatches:
-					for match in bmatches: 
-						if match.sport == "BASK":
-							if (match.home_team_full_name not in [x.home_team_full_name for x in basketball_matches] and
-								match.away_team_full_name not in [away_team.away_team_full_name for away_team in basketball_matches]):
-									basketball_matches.append(match)
-
-						elif match.sport == "FOOT":
-							if(match.home_team_full_name not in [z.home_team_full_name for z in football_matches] and
-								match.away_team_full_name not in [t.away_team_full_name for t in football_matches]):
-									football_matches.append(match)
-
-						elif match.sport == "BASE":
-							if (match.home_team_full_name not in [p.home_team_full_name for p in basketball_matches] and 
-								match.away_team_full_name not in [j.away_team_full_name for j in basketball_matches]):
-									basketball_matches.append(match)
-
-						elif match.sport == "TENN":
-							if (match.home_team_full_name not in [n.home_team_full_name for n in tennis_matches] and
-								match.away_team_full_name not in [m.away_team_full_name for m in tennis_matches]):
-									tennis_matches.append(match)
-
-						elif match.sport == "RUGBU":
-							if (match.home_team_full_name not in [s.home_team_full_name for s in rugby_matches] and
-								match.away_team_full_name not in [l.away_team_full_name for l in rugby_matches]):
-									rugby_matches.append(match)
-
-						elif match.sport == "SOCC":
-							if (match.home_team_full_name not in [g.home_team_full_name for g in soccer_matches] and
-								match.away_team_full_name not in [v.away_team_full_name for v in soccer_matches]):
-									soccer_matches.append(match)
-			return {
-				"basketball_matches": basketball_matches,
-				"baseball_matches": baseball_matches,
-				"rugby_matches": rugby_matches,
-				"football_matches":football_matches,
-				"soccer_matches":soccer_matches,
-				"tennis_matches": tennis_matches,
-			}
-	else:
-		raise BovadaException(request.reason)
+			raise BovadaException(request.reason)
 
 
 
 
 
-def find_relative_urls(response, index=1):
+def find_relative_urls(response, index=1, session=None):
 	#append the response object to response_objects list so we dont have to make any queries again.
 	if response.json() not in response_objects:
 		response_objects.append(response.json())
 	if response.url not in all_urls:
-		print response.url
 		all_urls.append(response.url)
 	try:
 		url_list = [x['relativeUrl'] for x in response.json()['data']['page']['navigation']['navigation'][index]['items'] if x not in all_urls]
@@ -116,17 +115,18 @@ def find_relative_urls(response, index=1):
 		pass
 	if url_list:
 		for url in url_list:
-			page = get_relative_url(url)
+			page = get_relative_url(url, session)
 			if page:
-				find_relative_urls(page, index=index+1)
+				find_relative_urls(page, index=index+1, session=session)
 		return all_urls
 	return all_urls
 
-def get_relative_url(endpoint):
+def get_relative_url(endpoint, session):
 	URL = "https://sports.bovada.lv{}?json=true".format(endpoint)
 	try:
-		response = requests.get(URL, headers=get_bovada_headers_generic())
-	except:
+		response = session.get(URL, headers=get_bovada_headers_generic())
+	except Exception, e:
+		print e
 		response = None
 		return response
 	if was_successful(response):
