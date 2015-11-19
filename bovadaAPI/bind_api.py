@@ -18,15 +18,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def bind_api(auth_obj, action, *args, **kwargs):
-	
-	bovada_match_file = os.path.join(BASE_DIR, "bmatches.json")
-	try:	
-		with open(bovada_match_file, 'r') as infile:
-			all_matches = json.loads(infile)
-	except IOError:
-		pass
-	else:
-		return all_matches
 	soccer_matches = []
 	basketball_matches = []
 	baseball_matches = []
@@ -37,26 +28,27 @@ def bind_api(auth_obj, action, *args, **kwargs):
 		amount_to_deposit = kwargs.pop("amount")
 	except KeyError:
 		amount_to_deposit = None
+
 	try:
-		outcomeId = kwargs.pop("outcomeId")
+		bets = kwargs.pop("bets")
 	except KeyError:
-		outcomeId = None
+		bets = None
 
 	urls_to_scrape = []
 	profile_id = auth_obj._auth["profile_id"]
 	access_token = auth_obj._auth["access_token"]
 	token_type = auth_obj._auth["token_type"]
 	expiration_date = auth_obj._auth["expiration_date"]
-	if action == "summary" or action=="wallets" or action=="deposit" or action=="place_bets":
+	cookies = auth_obj._auth["cookies"]
+	if action == "summary" or action=="wallets" or action=="deposit":
 		headers = get_bovada_headers_authorization(access_token, token_type)
 	else:
 		headers = get_bovada_headers_generic()
-	request = requests.get(get_endpoint(action=action, profile_id=profile_id, outcomeId=outcomeId), headers=headers)
+	
+	request = requests.get(get_endpoint(action=action, profile_id=profile_id), headers=headers, cookies=cookies)
 	if was_successful(request):
 		if action == "summary" or action =="wallets" or action=="deposit":
 			return parse_special_response(request)
-		elif action == "place_bets":
-			return validate_bets(bets, channel, groups, selections)
 		else:
 			query_all_endpoints = find_relative_urls(request)
 			print "number of requests {}".format(len(all_urls))
@@ -109,14 +101,16 @@ def bind_api(auth_obj, action, *args, **kwargs):
 
 
 
+
 def find_relative_urls(response, index=1):
 	#append the response object to response_objects list so we dont have to make any queries again.
 	if response.json() not in response_objects:
 		response_objects.append(response.json())
 	if response.url not in all_urls:
+		print response.url
 		all_urls.append(response.url)
 	try:
-		url_list = [x['relativeUrl'] for x in response.json()['data']['page']['navigation']['navigation'][index]['items']]
+		url_list = [x['relativeUrl'] for x in response.json()['data']['page']['navigation']['navigation'][index]['items'] if x not in all_urls]
 	except (IndexError, KeyError, TypeError):
 		url_list = None
 		pass
@@ -139,12 +133,13 @@ def get_relative_url(endpoint):
 		#save our response objects in memory so we dont have to query again.
 		response_objects.append(response.json())
 		return response
-def get_endpoint(action, profile_id, outcomeId=None):
+def get_endpoint(action, profile_id):
 	if  action == "soccer_matches":
 		endpoint = "https://sports.bovada.lv/soccer?json=true"
 
 	elif action == "summary":
 		 endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/summary" % profile_id
+
 
 	elif action == "deposit":
 		endpoint = "https://www.bovada.lv/?pushdown=cashier.deposit"

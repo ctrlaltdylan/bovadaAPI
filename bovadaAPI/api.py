@@ -7,6 +7,8 @@ from auth import login_to_bovada
 from error import BovadaException, BovadaAuthenticationError
 from decorators import authentication_required, authentication_recommended
 from bind_api import bind_api
+from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
+import requests
 import json
 import datetime
 
@@ -25,9 +27,13 @@ class BovadaApi(object):
 		except Exception, e:
 			raise BovadaAuthenticationError(e)
 		else:
+			cookies = dict()
+			for cookie in response.cookies:
+				cookies[cookie.name] = cookie.value
 			self._auth = response.json()
 			self._auth['profile_id'] = response.headers['X-Profile-Id']
 			self._auth['expiration_date'] = self._get_expiration_time(self._auth['expires_in'])
+			self._auth["cookies"] = cookies
 			return self._auth
 		
 
