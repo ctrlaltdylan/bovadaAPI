@@ -130,19 +130,51 @@ class BovadaMatch(object):
 
 class OutCome(object):
 	def __init__(self, *args, **kwargs):
+		#if odds_type == Totals we will have a total amount
+		#if odds_type == Point Spread we will have a spread amount
+		#the price is the odds
 		self.odds_type = kwargs.pop("odds_type")
 		self.name = kwargs.pop("name")
+		try:
+			self.total_amount = kwargs.pop("total_amount")
+		except:
+			self.total_amount = None
+		try:
+			self.spread_amount = kwargs.pop("spread_amount")
+		except:
+			self.spread_amount = None
 		self.price = kwargs.pop("price")
 		self.price_id = kwargs.pop("price_id")
 		self.outcome_id = kwargs.pop("outcome_id")
-		return super(OutCome, self).__init__(*args, **kwargs)
+		return super(OutCome, self).__init__()
 
 	@classmethod
 	def create_from_betting_line(cls, betting_line, *args, **kwargs):
 		outcome_objs = []
+		#each odds_type has it's own outcome objects
 		odds_type = betting_line["description"]
 		outcomes = betting_line["outcomes"]
 		for outcome in outcomes:
+			if odds_type == "Total":
+				try:
+					total_amount = float(outcome["price"]["handicap"])
+				except:
+					total_amount = None
+					spread_amount = None
+				else:
+					spread_amount = None
+
+			elif odds_type == "Point Spread":
+				try:
+					spread_amount = float(outcome["price"]["handicap"])
+				except:
+					spread_amount = None
+					total_amount = None
+				else:
+					total_amount = None
+			else:
+				spread_amount = None
+				total_amount = None
 			try:
 				name = outcome["description"]
 			except KeyError, e:
@@ -172,8 +204,9 @@ class OutCome(object):
 						name=name,
 						price=price,
 						price_id=price_id,
-						outcome_id=outcome_id,
-
+						spread_amount=spread_amount,
+						total_amount=total_amount,
+						outcome_id=outcome_id
 					)
 				)
 		return outcome_objs
