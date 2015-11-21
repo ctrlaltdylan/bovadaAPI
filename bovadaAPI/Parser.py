@@ -164,7 +164,7 @@ class OutCome(object):
 					total_amount = float(outcome["price"]["handicap"])
 				except:
 					pass
-			if odds_type == "Point Spread" or odds_type == "Goal Spread":
+			if odds_type == "Point Spread" or odds_type == "Goal Spread" or odds_type=="Point Spread - Sets":
 				try:
 					spread_amount = float(outcome["price"]["handicap"])
 				except:
