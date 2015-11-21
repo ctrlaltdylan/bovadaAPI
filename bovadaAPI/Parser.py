@@ -154,27 +154,23 @@ class OutCome(object):
 		#each odds_type has it's own outcome objects
 		odds_type = betting_line["description"]
 		outcomes = betting_line["outcomes"]
+
 		for outcome in outcomes:
+			spread_amount = None
+			total_amount = None
+			
 			if odds_type == "Total":
 				try:
 					total_amount = float(outcome["price"]["handicap"])
 				except:
-					total_amount = None
-					spread_amount = None
-				else:
-					spread_amount = None
-
-			elif odds_type == "Point Spread":
+					pass
+			if odds_type == "Point Spread" or odds_type == "Goal Spread":
 				try:
 					spread_amount = float(outcome["price"]["handicap"])
 				except:
-					spread_amount = None
-					total_amount = None
-				else:
-					total_amount = None
-			else:
-				spread_amount = None
-				total_amount = None
+					pass
+	
+			
 			try:
 				name = outcome["description"]
 			except KeyError, e:
