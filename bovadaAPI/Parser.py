@@ -130,20 +130,11 @@ class BovadaMatch(object):
 
 class OutCome(object):
 	def __init__(self, *args, **kwargs):
-		#if odds_type == Totals we will have a total amount
-		#if odds_type == Point Spread we will have a spread amount
-		#the price is the odds
 		self.odds_type = kwargs.pop("odds_type")
 		self.name = kwargs.pop("name")
-		try:
-			self.total_amount = kwargs.pop("total_amount")
-		except:
-			self.total_amount = None
-		try:
-			self.spread_amount = kwargs.pop("spread_amount")
-		except:
-			self.spread_amount = None
-		self.price = kwargs.pop("price")
+		self.price_decimal = kwargs.pop("price_decimal")
+		self.spread_amount = kwargs.pop("spread_amount")
+		self.total_amount = kwargs.pop("total_amount")
 		self.price_id = kwargs.pop("price_id")
 		self.outcome_id = kwargs.pop("outcome_id")
 		return super(OutCome, self).__init__()
@@ -151,34 +142,34 @@ class OutCome(object):
 	@classmethod
 	def create_from_betting_line(cls, betting_line, *args, **kwargs):
 		outcome_objs = []
-		#each odds_type has it's own outcome objects
 		odds_type = betting_line["description"]
 		outcomes = betting_line["outcomes"]
-
 		for outcome in outcomes:
 			spread_amount = None
 			total_amount = None
-			
 			if odds_type == "Total":
 				try:
 					total_amount = float(outcome["price"]["handicap"])
-				except:
-					pass
-			if odds_type == "Point Spread" or odds_type == "Goal Spread" or odds_type=="Point Spread - Sets":
+				except Exception, e:
+					total_amount = None
+
+			if odds_type == "Point Spread" or odds_type=="Goal Spread" or odds_type == "Point Spread --sets":
 				try:
 					spread_amount = float(outcome["price"]["handicap"])
-				except:
-					pass
-	
-			
+				except Exception, e: 
+					spread_amount = None
+
+
+			#print outcome
+			#return outcome["price"]["handicap"]
 			try:
 				name = outcome["description"]
 			except KeyError, e:
 				name = None
 			try:
-				price = float(outcome["price"]['decimal'])
+				price_decimal = float(outcome["price"]['decimal'])
 			except KeyError, e:
-				price = None
+				price_decimal = None
 
 			try:
 				status = outcome['status']
@@ -198,13 +189,22 @@ class OutCome(object):
 					cls(
 						odds_type=odds_type,
 						name=name,
-						price=price,
+						price_decimal=price_decimal,
+						spread_amount = spread_amount,
+						total_amount = total_amount,
 						price_id=price_id,
-						spread_amount=spread_amount,
-						total_amount=total_amount,
-						outcome_id=outcome_id
+						outcome_id=outcome_id,
+
 					)
 				)
+		for outcome_obj in outcome_objs:
+			if outcome_obj.price_decimal == None:
+				outcome_objs.remove(outcome_obj)
+			elif odds_type == "Total" and not outcome_obj.total_amount:
+				outcome_objs.remove(outcome_obj)
+
+			elif odds_type.__contains__("Spread") and not outcome_obj.spread_amount:
+				outcome_objs.remove(outcome_obj)
 		return outcome_objs
 
 
