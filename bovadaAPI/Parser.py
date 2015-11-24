@@ -160,8 +160,6 @@ class OutCome(object):
 					spread_amount = None
 
 
-			#print outcome
-			#return outcome["price"]["handicap"]
 			try:
 				name = outcome["description"]
 			except KeyError, e:
@@ -221,8 +219,4 @@ def parse_response(response):
 	return bmatches
 
 	
-
-def save_bovada_matches(bmatches):
-	with open("bmatches.json", "w+") as outfile:
-		json.dumps(bmatches, outfile)
 			
