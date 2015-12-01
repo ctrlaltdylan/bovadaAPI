@@ -39,7 +39,15 @@ def bind_api(auth_obj, action, *args, **kwargs):
 	token_type = auth_obj._auth["token_type"]
 	expiration_date = auth_obj._auth["expiration_date"]
 	cookies = auth_obj._auth["cookies"]
-	if action == "summary" or action=="wallets" or action=="deposit" or action=="balance":
+	if (
+		action == "summary" or 
+		action=="wallets" or 
+		action=="deposit" or 
+		action=="balance" or
+		action == "bet_history" or
+		action == "open_bets"
+		):
+
 		headers = get_bovada_headers_authorization(access_token, token_type)
 	else:
 		headers = get_bovada_headers_generic()
@@ -47,7 +55,13 @@ def bind_api(auth_obj, action, *args, **kwargs):
 	with requests.Session() as s:
 		request = s.get(get_endpoint(action=action, profile_id=profile_id), headers=headers, cookies=cookies)
 		if was_successful(request):
-			if action == "summary" or action =="wallets" or action=="deposit" or action=="balance":
+			if (action == "summary" or 
+				action =="wallets" or 
+				action=="deposit" or 
+				action=="balance" or
+				action == "open_bets" or
+				action == "bet_history"
+				):
 				return parse_special_response(request, action=action)
 			else:
 				query_all_endpoints = find_relative_urls(request, session=s)
@@ -169,7 +183,15 @@ def get_endpoint(action, profile_id):
 			#format https://sports.bovada.lv/services/sports/bet/betslip?outcomeId=A:91769724:1&outcomeId=A:91769726:2
 			endpoint = "https://sports.bovada.lv/services/sports/bet/betslip?outcomeId={}"
 	
+
+	elif action == "open_bets":
+		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/10667592/wagers?status=OPEN&channel=ALL"
+
+	elif action == "bet_history":
+		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/10667592/wagers?status=SETTLED&channel=ALL&days=14"
+
 	else:
 		raise BovadaException("did not receive a valid action. Received: {}".format(action))
+
 	return endpoint
 

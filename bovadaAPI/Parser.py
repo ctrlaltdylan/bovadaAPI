@@ -35,16 +35,17 @@ class BovadaMatch(object):
 		description = match['description']
 		startTime = match['startTime']
 		competitors = match['competitors']
-		home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[1])
-		home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
-		home_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
-		away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
-		away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[0])
-		away_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
+		home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[0])
+		home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
+		home_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
+		away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
+		away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[1])
+		away_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
 		game_link = "https://sports.bovada.lv{}".format(match['link'])
 		type_ = match['type']
 		displayGroups= match['displayGroups']
 		for group in displayGroups:
+			#if the group is not a gameline we'll skip over it.
 			if group['description'] != "Game Lines":
 				pass
 			else:
@@ -86,12 +87,12 @@ class BovadaMatch(object):
 			description = match['description']
 			startTime = match['startTime']
 			competitors = match['competitors']
-			home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[1])
-			home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
-			home_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
-			away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
-			away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[0])
-			away_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
+			home_team_abbreviation = search_dictionary_for_certain_keys("abbreviation", competitors[0])
+			home_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[0])
+			home_team_full_name = search_dictionary_for_certain_keys("description", competitors[0])
+			away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
+			away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[1])
+			away_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
 			game_link = "https://sports.bovada.lv{}".format(match['link'])
 			type_ = match['type']
 			displayGroups= match['displayGroups']
@@ -211,6 +212,68 @@ class OutCome(object):
 def parse_special_response(response, action):
 	if action == "balance":
 		return int(search_dictionary_for_certain_keys("availableBalance", response.json())["amount"])
+	elif action == "summary":
+		return response.json()
+
+	elif action == "wallets":
+		return response.json()
+
+	elif action == "open_bets":
+		outstanding_bet_amount = 0
+		try:
+			items = response.json()["items"]
+		except KeyError, e:
+			items = None
+
+		if items:
+			for item in items:
+				try:
+					riskAmount = item["riskAmount"]
+				except KeyError, e:
+					riskAmount = None
+				if riskAmount:
+					try:
+						riskAmount = float(riskAmount)
+					except Exception, e:
+						print e
+						riskAmount = riskAmount
+
+					outstanding_bet_amount += riskAmount
+		return "number of outstanding bets: {} outstanding_bet_amount: {}".format(len(items), outstanding_bet_amount)
+
+	elif action == "bet_history":
+		total_profit = 0
+		number_of_bets_won = 0
+		number_of_bets_lost = 0
+		try:
+			items = response.json()["items"]
+		except KeyError, e:
+			items = None
+
+		if items:
+			for item in items:
+				try:
+					outcomeCode = item["outcomeCode"]
+				except KeyError, e:
+					outcomeCode = None
+
+				if (outcomeCode and 
+					outcomeCode == "W"
+					):
+					number_of_bets_won += 1
+					total_profit += float(item["toWinAmount"]) + float(item["riskAmount"]) - float(item["riskAmount"])
+
+
+				elif (outcomeCode and 
+					outcomeCode == "L"
+					):
+					number_of_bets_lost +=1
+					total_profit -= float(item["riskAmount"])
+			return "total_profit: ${}, num_bets_won: {}:), number_of_bets_lost: {}:(".format(total_profit, number_of_bets_won, number_of_bets_lost)
+
+
+
+
 	return response
 
 def parse_response(response):

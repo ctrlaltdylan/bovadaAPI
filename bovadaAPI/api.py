@@ -37,7 +37,6 @@ class BovadaApi(object):
 			return self._auth
 		
 
-
 		
 	
 	@property
@@ -115,11 +114,18 @@ class BovadaApi(object):
 
 	
 
-def test():
-	b = BovadaApi()
-	b.auth
-	print b.auth
-	return b.basketball_matches
+def stream():
+	import time
+	while True:
+
+		b = BovadaApi()
+		b.auth
+		print "balance {}".format(b.balance)
+		print "\n"
+		print "open_bets {}".format(b.open_bets)
+		print "\n"
+		print "bet_history {}".format(b.bet_history)
+		time.sleep(100)
 
 
 
