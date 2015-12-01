@@ -133,6 +133,7 @@ class OutCome(object):
 	def __init__(self, *args, **kwargs):
 		self.odds_type = kwargs.pop("odds_type")
 		self.total_line = kwargs.pop("total_line")
+		self.spread_line = kwargs.pop("spread_line")
 		self.name = kwargs.pop("name")
 		self.price_decimal = kwargs.pop("price_decimal")
 		self.spread_amount = kwargs.pop("spread_amount")
