@@ -132,6 +132,7 @@ class BovadaMatch(object):
 class OutCome(object):
 	def __init__(self, *args, **kwargs):
 		self.odds_type = kwargs.pop("odds_type")
+		self.total_line = kwargs.pop("total_line")
 		self.name = kwargs.pop("name")
 		self.price_decimal = kwargs.pop("price_decimal")
 		self.spread_amount = kwargs.pop("spread_amount")
@@ -148,17 +149,23 @@ class OutCome(object):
 		for outcome in outcomes:
 			spread_amount = None
 			total_amount = None
+			spread_line = None
+			total_line = None
 			if odds_type == "Total":
 				try:
 					total_amount = float(outcome["price"]["handicap"])
 				except Exception, e:
 					total_amount = None
 
+				total_line = outcome["type"]
+
 			if odds_type == "Point Spread" or odds_type=="Goal Spread" or odds_type == "Point Spread --sets":
 				try:
 					spread_amount = float(outcome["price"]["handicap"])
 				except Exception, e: 
 					spread_amount = None
+
+				spread_line = outcome["type"]
 
 
 			try:
@@ -187,6 +194,8 @@ class OutCome(object):
 				outcome_objs.append(
 					cls(
 						odds_type=odds_type,
+						total_line=total_line,
+						spread_line=spread_line,
 						name=name,
 						price_decimal=price_decimal,
 						spread_amount = spread_amount,
