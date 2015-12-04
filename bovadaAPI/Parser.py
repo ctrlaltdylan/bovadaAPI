@@ -132,6 +132,7 @@ class BovadaMatch(object):
 class OutCome(object):
 	def __init__(self, *args, **kwargs):
 		self.odds_type = kwargs.pop("odds_type")
+		self.outcome_type = kwargs.pop("outcome_type")
 		self.total_line = kwargs.pop("total_line")
 		self.spread_line = kwargs.pop("spread_line")
 		self.name = kwargs.pop("name")
@@ -173,6 +174,11 @@ class OutCome(object):
 				name = outcome["description"]
 			except KeyError, e:
 				name = None
+
+			try:
+				outcome_type = outcome["type"]
+			except KeyError, e:
+				outcome_type = None
 			try:
 				price_decimal = float(outcome["price"]['decimal'])
 			except KeyError, e:
@@ -203,6 +209,7 @@ class OutCome(object):
 						total_amount = total_amount,
 						price_id=price_id,
 						outcome_id=outcome_id,
+						outcome_type=outcome_type,
 
 					)
 				)
