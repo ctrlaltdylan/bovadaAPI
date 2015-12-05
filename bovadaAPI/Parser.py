@@ -207,8 +207,14 @@ class OutCome(object):
 	def __init__(self, *args, **kwargs):
 		#3-Way MoneyLine
 		self.odds_type = kwargs.pop("odds_type")
+<<<<<<< HEAD
 		#H = Home, A = Away, O = Over, U = Under
 		self.outcome_type = kwargs.pop("outcome_type")
+=======
+		self.outcome_type = kwargs.pop("outcome_type")
+		self.total_line = kwargs.pop("total_line")
+		self.spread_line = kwargs.pop("spread_line")
+>>>>>>> 7f5c6851bfe3214bf9337ea98a1b0a97a5cbbe89
 		self.name = kwargs.pop("name")
 		self.odds = kwargs.pop("odds")
 		self.handicap = kwargs.pop("handicap")
@@ -238,6 +244,11 @@ class OutCome(object):
 				name = outcome["description"]
 			except KeyError, e:
 				name = None
+
+			try:
+				outcome_type = outcome["type"]
+			except KeyError, e:
+				outcome_type = None
 			try:
 				odds = float(outcome["price"]['decimal'])
 			except KeyError, e:
@@ -260,12 +271,15 @@ class OutCome(object):
 				outcome_objs.append(
 					cls(
 						odds_type=odds_type,
+						total_line=total_line,
+						spread_line=spread_line,
 						name=name,
 						outcome_type=outcome_type,
 						odds=odds,
 						handicap = handicap,
 						price_id=price_id,
 						outcome_id=outcome_id,
+						outcome_type=outcome_type,
 
 					)
 				)
