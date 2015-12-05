@@ -207,14 +207,8 @@ class OutCome(object):
 	def __init__(self, *args, **kwargs):
 		#3-Way MoneyLine
 		self.odds_type = kwargs.pop("odds_type")
-<<<<<<< HEAD
 		#H = Home, A = Away, O = Over, U = Under
 		self.outcome_type = kwargs.pop("outcome_type")
-=======
-		self.outcome_type = kwargs.pop("outcome_type")
-		self.total_line = kwargs.pop("total_line")
-		self.spread_line = kwargs.pop("spread_line")
->>>>>>> 7f5c6851bfe3214bf9337ea98a1b0a97a5cbbe89
 		self.name = kwargs.pop("name")
 		self.odds = kwargs.pop("odds")
 		self.handicap = kwargs.pop("handicap")
