@@ -68,13 +68,18 @@ def bind_api(auth_obj, action, *args, **kwargs):
 				
 				for obj in response_objects:
 					#this is where we actually get the bovada matches on each page
-					bmatches = parse_response(obj)
+					try:
+						bmatches = parse_response(obj)
+					except Exception, e:
+						print e
+						print "something went wrong parsing the json obj"
 					if bmatches:
-						for match in bmatches: 
+						for match in bmatches:
 							if match.sport == "BASK":
 								if (match.home_team_full_name not in [x.home_team_full_name for x in basketball_matches] and
 									match.away_team_full_name not in [away_team.away_team_full_name for away_team in basketball_matches]):
 										basketball_matches.append(match)
+
 
 							elif match.sport == "FOOT":
 								if(match.home_team_full_name not in [z.home_team_full_name for z in football_matches] and
@@ -91,15 +96,19 @@ def bind_api(auth_obj, action, *args, **kwargs):
 									match.away_team_full_name not in [m.away_team_full_name for m in tennis_matches]):
 										tennis_matches.append(match)
 
-							elif match.sport == "RUGBU":
+							elif match.sport == "RUGU":
 								if (match.home_team_full_name not in [s.home_team_full_name for s in rugby_matches] and
-									match.away_team_full_name not in [l.away_team_full_name for l in rugby_matches]):
+									match.away_team_full_name not in [l.away_team_full_name for l in rugby_matches]
+									):
 										rugby_matches.append(match)
+								
 
 							elif match.sport == "SOCC":
 								if (match.home_team_full_name not in [g.home_team_full_name for g in soccer_matches] and
 									match.away_team_full_name not in [v.away_team_full_name for v in soccer_matches]):
 										soccer_matches.append(match)
+							else:
+								print "cant parse sport or sport is none: ", match.sport
 				return {
 					"basketball_matches": basketball_matches,
 					"baseball_matches": baseball_matches,
@@ -110,7 +119,7 @@ def bind_api(auth_obj, action, *args, **kwargs):
 				}
 		else:
 			raise BovadaException(request.reason)
-
+	return "done"
 
 
 
@@ -185,10 +194,10 @@ def get_endpoint(action, profile_id):
 	
 
 	elif action == "open_bets":
-		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/10667592/wagers?status=OPEN&channel=ALL"
+		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/%s/wagers?status=OPEN&channel=ALL" %profile_id
 
 	elif action == "bet_history":
-		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/10667592/wagers?status=SETTLED&channel=ALL&days=14"
+		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/%s/wagers?status=SETTLED&channel=ALL&days=14" %profile_id
 
 	else:
 		raise BovadaException("did not receive a valid action. Received: {}".format(action))

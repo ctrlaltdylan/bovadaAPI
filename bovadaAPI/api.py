@@ -77,7 +77,7 @@ class BovadaApi(object):
 	@cached_property
 	@authentication_recommended
 	def rugby_matches(self):
-		return bind_api(self, action="rugby_matches")['rugby_matches']
+		return bind_api(self, action="rugby_matches")["rugby_matches"]
 
 	@cached_property
 	@authentication_recommended
