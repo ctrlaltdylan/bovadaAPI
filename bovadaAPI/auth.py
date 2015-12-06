@@ -1,6 +1,5 @@
 import os
 from error import BovadaException, BovadaAuthenticationError
-from was_successful import was_successful
 from headers import get_bovada_headers_generic
 import requests
 import json
