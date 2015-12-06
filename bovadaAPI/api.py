@@ -72,8 +72,8 @@ class BovadaApi(object):
 
 	@property
 	@authentication_required
-	"""this returns your open bets"""
 	def open_bets(self):
+		"""this returns your open bets"""
 		return bind_api(self, action="open_bets")
 
 
