@@ -75,7 +75,7 @@ class BovadaApi(object):
 		"""this returns your open bets"""
 		return bind_api(self, action="open_bets")
 
-
+	@property
 	@authentication_recommended
 	def soccer_matches(self):
 		""" this returns all soccer matches
@@ -85,7 +85,7 @@ class BovadaApi(object):
 		"""
 		return bind_api(self, action="soccer_matches")['soccer_matches']
 
-
+	@property
 	@authentication_recommended
 	def basketball_matches(self):
 		"""
@@ -95,7 +95,7 @@ class BovadaApi(object):
 		"""
 		return bind_api(self, action="basketball_matches")['basketball_matches']
 	
-
+	@property
 	@authentication_recommended
 	def tennis_matches(self):
 		"""
@@ -106,7 +106,7 @@ class BovadaApi(object):
 
 		return bind_api(self, action="tennis_matches")['tennis_matches']
 
-
+	@property
 	@authentication_recommended
 	def rugby_matches(self):
 		"""
@@ -116,7 +116,7 @@ class BovadaApi(object):
 		"""
 		return bind_api(self, action="rugby_matches")["rugby_matches"]
 
-
+	@property
 	@authentication_recommended
 	def football_matches(self):
 		"""
@@ -127,7 +127,7 @@ class BovadaApi(object):
 		return bind_api(self, action="football_matches")['football_matches']
 
 	
-
+	@property
 	@authentication_recommended
 	def baseball_matches(self):
 		"""
