@@ -27,11 +27,12 @@ class BovadaApi(object):
 		return super(BovadaApi, self).__init__(*args, **kwargs)
 
 	@property
-	"""attemps to login to bovada with exports BovadaUsername and Password
+	def auth(self):
+		"""
+		attemps to login to bovada with exports BovadaUsername and Password
 		if the request is successfull, all subsequent requests will use the cookies
 		and headers that were sent back from bovada. 
-	"""
-	def auth(self):
+		"""
 		try:
 			login = login_to_bovada()
 		except Exception, e:
@@ -51,21 +52,22 @@ class BovadaApi(object):
 	
 	@property
 	@authentication_required
-	"""this returns your account summary
-	"""
+	
 	def summary(self):
+		"""this returns your account summary
+		"""
 		return bind_api(self, action="summary")
 
 	@property
 	@authentication_required
-	"""this returns your current balance as an int"""
 	def balance(self):
+		"""this returns your current balance as an int"""
 		return bind_api(self, action="balance")
 
 	@property
 	@authentication_required
-	"""this returns your bet_history """
 	def bet_history(self):
+		"""this returns your bet_history """
 		return bind_api(self, action="bet_history")
 
 	@property
