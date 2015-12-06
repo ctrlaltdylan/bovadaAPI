@@ -272,9 +272,7 @@ class OutCome(object):
 						odds=odds,
 						handicap = handicap,
 						price_id=price_id,
-						outcome_id=outcome_id,
-						outcome_type=outcome_type,
-
+						outcome_id=outcome_id
 					)
 				)
 		
