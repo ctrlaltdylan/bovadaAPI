@@ -265,8 +265,6 @@ class OutCome(object):
 				outcome_objs.append(
 					cls(
 						odds_type=odds_type,
-						total_line=total_line,
-						spread_line=spread_line,
 						name=name,
 						outcome_type=outcome_type,
 						odds=odds,
