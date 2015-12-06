@@ -43,7 +43,6 @@ class BovadaApi(object):
 				cookies[cookie.name] = cookie.value
 			self._auth = login.json()
 			self._auth['profile_id'] = login.headers['X-Profile-Id']
-			self._auth['expiration_date'] = self._get_expiration_time(self._auth['expires_in'])
 			self._auth["cookies"] = cookies
 			return self._auth
 		
