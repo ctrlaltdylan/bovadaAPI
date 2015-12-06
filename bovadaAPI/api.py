@@ -15,23 +15,33 @@ import datetime
 
 
 class BovadaApi(object):
+	""" A class to interface with https://bovada.lv 
+		The methods defined in here send an action to the bind_api() which consequently 
+		sends the appropriate http get request or post request to a specific bovada.lv endpoint
+		By default auth credentials is set to None. To use account specific functions like
+		balance, summary, bet_history or open bets you must export a BovadaUsername and a BovadaPassword
+	"""
 
 	def __init__(self, *args, **kwargs):
 		self._auth = None
 		return super(BovadaApi, self).__init__(*args, **kwargs)
 
 	@property
+	"""attemps to login to bovada with exports BovadaUsername and Password
+		if the request is successfull, all subsequent requests will use the cookies
+		and headers that were sent back from bovada. 
+	"""
 	def auth(self):
 		try:
-			response = login_to_bovada()
+			login = login_to_bovada()
 		except Exception, e:
 			raise BovadaAuthenticationError(e)
 		else:
 			cookies = dict()
-			for cookie in response.cookies:
+			for cookie in login.cookies:
 				cookies[cookie.name] = cookie.value
-			self._auth = response.json()
-			self._auth['profile_id'] = response.headers['X-Profile-Id']
+			self._auth = login.json()
+			self._auth['profile_id'] = login.headers['X-Profile-Id']
 			self._auth['expiration_date'] = self._get_expiration_time(self._auth['expires_in'])
 			self._auth["cookies"] = cookies
 			return self._auth
@@ -41,80 +51,98 @@ class BovadaApi(object):
 	
 	@property
 	@authentication_required
+	"""this returns your account summary
+	"""
 	def summary(self):
 		return bind_api(self, action="summary")
 
 	@property
 	@authentication_required
+	"""this returns your current balance as an int"""
 	def balance(self):
 		return bind_api(self, action="balance")
 
 	@property
 	@authentication_required
+	"""this returns your bet_history """
 	def bet_history(self):
 		return bind_api(self, action="bet_history")
 
 	@property
 	@authentication_required
+	"""this returns your open bets"""
 	def open_bets(self):
 		return bind_api(self, action="open_bets")
 
-	@cached_property
+
 	@authentication_recommended
 	def soccer_matches(self):
+		""" this returns all soccer matches
+			the first url to be queried is https://sports.bovada.lv/soccer/
+			then all subsequent urls are queried and scraped to return all soccer matches
+			currently on bovada. If that's not dope, I don't know what is.
+		"""
 		return bind_api(self, action="soccer_matches")['soccer_matches']
 
-	@cached_property
+
 	@authentication_recommended
 	def basketball_matches(self):
+		"""
+			the first url to be queried is https://sports.bovada.lv/basketball/
+			then all subsequent urls are queried and scraped to return all basketball matches
+			currently on bovada. If that's not dope, I don't know what is.
+		"""
 		return bind_api(self, action="basketball_matches")['basketball_matches']
 	
-	@cached_property
+
 	@authentication_recommended
 	def tennis_matches(self):
+		"""
+			the first url to be queried is https://sports.bovada.lv/tennis/
+			then all subsequent urls are queried and scraped to return all tennis matches
+			currently on bovada. If that's not dope, I don't know what is.
+		"""
+
 		return bind_api(self, action="tennis_matches")['tennis_matches']
 
-	@cached_property
+
 	@authentication_recommended
 	def rugby_matches(self):
+		"""
+			the first url to be queried is https://sports.bovada.lv/rugby-union/
+			then all subsequent urls are queried and scraped to return all rugby matches
+			currently on bovada. If that's not dope, I don't know what is.
+		"""
 		return bind_api(self, action="rugby_matches")["rugby_matches"]
 
-	@cached_property
+
 	@authentication_recommended
 	def football_matches(self):
+		"""
+			the first url to be queried is https://sports.bovada.lv/football/
+			then all subsequent urls are queried and scraped to return all football matches
+			currently on bovada. If that's not dope, I don't know what is.
+		"""
 		return bind_api(self, action="football_matches")['football_matches']
 
 	
-	@cached_property
+
 	@authentication_recommended
 	def baseball_matches(self):
+		"""
+			the first url to be queried is https://sports.bovada.lv/baseball/
+			then all subsequent urls are queried and scraped to return all baseball matches
+			currently on bovada. If that's not dope, I don't know what is.
+		"""
 		return bind_api(self, action="baseball_matches")['baseball_matches']
-	#generates an expiration time obj by adding the fast_forward amount to the current time
-	def _get_expiration_time(self, fast_forward):
-		pass
+	
 
-	@authentication_required
-	#endpoint = https://sports.bovada.lv/services/sports/bet/betslip/validate
-	def validate_bets(self, bets):
-		return bind_api(self, action="validate_bets", bets=bets)
-
-	@authentication_required
-	def place_bets(self, *args):
-		#https://sports.bovada.lv/services/sports/bet/betslip/c7a970f8-37ca-39dd-ab5f-69fb560aea42
-		return bind_api(action="place_bets", *args)
-
-	@authentication_required
-	def deposit(self, amount):
-		return bind_api(self, action="deposit", amount=amount)
-
-	@property
-	@authentication_required
-	def wallet(self):
-		return bind_api(self, action="wallets")
 
 	
 
 def stream():
+	""" a fun function to run that periodiclly checks to see how much money you're up,
+	by comparing your bet history """
 	import time
 	while True:
 

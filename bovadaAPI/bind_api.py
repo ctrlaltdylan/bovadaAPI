@@ -1,7 +1,6 @@
 import os
 from error import BovadaException
 import requests
-from was_successful import was_successful
 from headers import get_bovada_headers_generic, get_bovada_headers_authorization
 from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
 from Parser import parse_response, parse_special_response
@@ -54,7 +53,7 @@ def bind_api(auth_obj, action, *args, **kwargs):
 	
 	with requests.Session() as s:
 		request = s.get(get_endpoint(action=action, profile_id=profile_id), headers=headers, cookies=cookies)
-		if was_successful(request):
+		if request.status_code == 200:
 			if (action == "summary" or 
 				action =="wallets" or 
 				action=="deposit" or 
@@ -150,7 +149,7 @@ def get_relative_url(endpoint, session):
 	except Exception, e:
 		response = None
 		return response
-	if was_successful(response):
+	if response.status_code == 200:
 		#save our response objects in memory so we dont have to query again.
 		response_objects.append(response.json())
 		return response
@@ -184,13 +183,6 @@ def get_endpoint(action, profile_id):
 
 	elif action == "baseball_matches":
 		endpoint = "https://sports.bovada.lv/baseball?json=true"
-
-	elif action == "place_bets":
-		if not outcomeId:
-			raise BovadaException("can't place a bet without the outcome id")
-		else:
-			#format https://sports.bovada.lv/services/sports/bet/betslip?outcomeId=A:91769724:1&outcomeId=A:91769726:2
-			endpoint = "https://sports.bovada.lv/services/sports/bet/betslip?outcomeId={}"
 	
 
 	elif action == "open_bets":

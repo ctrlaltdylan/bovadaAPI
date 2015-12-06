@@ -8,13 +8,17 @@ import time
 
 
 def login_to_bovada():
+	"""on purpose I kept the login flow the same as if you were logging into Bovada using a browser.
+		I could have just queried the api/token endpoint directly, but figured that may raise some
+		flags with bovada since the login process would be skipping a step. 
+	"""
 	query_1 = query_login_endpoint() #query the login endpoint like we would if using a browser
-	if was_successful(query_1):
-		query_2 = bovada_auth()
-		if was_successful(query_2):
-			return query_2
+	if query_1.status_code == 200:
+		authenticated_ourselves = bovada_auth()
+		if authenticated_ourselves.status_code == 200:
+			return authenticated_ourselves
 		else:
-			raise BovadaAuthenticationError(query_2.reason)
+			raise BovadaAuthenticationError(authenticated_ourselves.reason)
 	else:
 		raise BovadaException(query_1.reason)
 
