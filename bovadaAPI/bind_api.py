@@ -36,7 +36,6 @@ def bind_api(auth_obj, action, *args, **kwargs):
 	profile_id = auth_obj._auth["profile_id"]
 	access_token = auth_obj._auth["access_token"]
 	token_type = auth_obj._auth["token_type"]
-	expiration_date = auth_obj._auth["expiration_date"]
 	cookies = auth_obj._auth["cookies"]
 	if (
 		action == "summary" or 
