@@ -142,7 +142,7 @@ def find_relative_urls(response, index=1, session=None):
 	return all_urls
 
 def get_relative_url(endpoint, session):
-	URL = "https://sports.bovada.lv{}?json=true".format(endpoint)
+	URL = "https://sports.bovada.lv{0}?json=true".format(endpoint)
 	try:
 		response = session.get(URL, headers=get_bovada_headers_generic())
 	except Exception, e:
@@ -191,7 +191,7 @@ def get_endpoint(action, profile_id):
 		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/%s/wagers?status=SETTLED&channel=ALL&days=14" %profile_id
 
 	else:
-		raise BovadaException("did not receive a valid action. Received: {}".format(action))
+		raise BovadaException("did not receive a valid action. Received: {0}".format(action))
 
 	return endpoint
 

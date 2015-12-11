@@ -149,11 +149,11 @@ def stream():
 
 		b = BovadaApi()
 		b.auth
-		print "balance {}".format(b.balance)
+		print "balance {0}".format(b.balance)
 		print "\n"
-		print "open_bets {}".format(b.open_bets)
+		print "open_bets {0}".format(b.open_bets)
 		print "\n"
-		print "bet_history {}".format(b.bet_history)
+		print "bet_history {0}".format(b.bet_history)
 		time.sleep(100)
 
 

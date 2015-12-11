@@ -41,7 +41,7 @@ class BovadaMatch(object):
 		away_team_short_name = search_dictionary_for_certain_keys("shortName", competitors[1])
 		away_team_abbreviation=  search_dictionary_for_certain_keys("abbreviation", competitors[1])
 		away_team_full_name = search_dictionary_for_certain_keys("description", competitors[1])
-		game_link = "https://sports.bovada.lv{}".format(match['link'])
+		game_link = "https://sports.bovada.lv{0}".format(match['link'])
 		type_ = match['type']
 		displayGroups= match['displayGroups']
 		for group in displayGroups:
@@ -145,7 +145,7 @@ class BovadaMatch(object):
 				except (KeyError, IndexError):
 					pass
 				try:
-					game_link = "https://sports.bovada.lv{}".format(match['link'])
+					game_link = "https://sports.bovada.lv{0}".format(match['link'])
 				except (KeyError, TypeError):
 					pass
 				try:
@@ -309,7 +309,7 @@ def parse_special_response(response, action):
 						riskAmount = riskAmount
 
 					outstanding_bet_amount += riskAmount
-		return "number of outstanding bets: {} outstanding_bet_amount: {}".format(len(items), outstanding_bet_amount)
+		return "number of outstanding bets: {0} outstanding_bet_amount: {1}".format(len(items), outstanding_bet_amount)
 
 	elif action == "bet_history":
 		total_profit = 0
@@ -339,7 +339,7 @@ def parse_special_response(response, action):
 					):
 					number_of_bets_lost +=1
 					total_profit -= float(item["riskAmount"])
-			return "total_profit: ${}, num_bets_won: {}:), number_of_bets_lost: {}:(".format(total_profit, number_of_bets_won, number_of_bets_lost)
+			return "total_profit: ${0}, num_bets_won: {1}:), number_of_bets_lost: {2}:(".format(total_profit, number_of_bets_won, number_of_bets_lost)
 
 
 
