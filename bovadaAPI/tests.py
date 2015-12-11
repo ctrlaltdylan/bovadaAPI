@@ -44,7 +44,7 @@ class MyTest(unittest.TestCase):
 		for match in all_matches:
 			printed_link = False
 			for key, value in match.__dict__.iteritems():
-				if value == None:
+				if value is None:
 					exclude_endpoints.append(match.game_link)
 					print key + "is none"
 		print exclude_endpoints
