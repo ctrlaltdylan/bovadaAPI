@@ -157,16 +157,16 @@ def get_endpoint(action, profile_id):
 		endpoint = "https://sports.bovada.lv/soccer?json=true"
 
 	elif action == "summary":
-		 endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/summary" % profile_id
+		 endpoint = "https://www.bovada.lv/services/web/v2/profiles/{0!s}/summary".format(profile_id)
 	elif action == "balance":
-		endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/summary" % profile_id
+		endpoint = "https://www.bovada.lv/services/web/v2/profiles/{0!s}/summary".format(profile_id)
 
 
 	elif action == "deposit":
 		endpoint = "https://www.bovada.lv/?pushdown=cashier.deposit"
 
 	elif action == "wallets":
-		endpoint = "https://www.bovada.lv/services/web/v2/profiles/%s/wallets" % profile_id
+		endpoint = "https://www.bovada.lv/services/web/v2/profiles/{0!s}/wallets".format(profile_id)
 
 	elif action == "basketball_matches":
 		endpoint = "https://sports.bovada.lv/basketball?json=true"
@@ -185,10 +185,10 @@ def get_endpoint(action, profile_id):
 	
 
 	elif action == "open_bets":
-		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/%s/wagers?status=OPEN&channel=ALL" %profile_id
+		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/{0!s}/wagers?status=OPEN&channel=ALL".format(profile_id)
 
 	elif action == "bet_history":
-		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/%s/wagers?status=SETTLED&channel=ALL&days=14" %profile_id
+		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/{0!s}/wagers?status=SETTLED&channel=ALL&days=14".format(profile_id)
 
 	else:
 		raise BovadaException("did not receive a valid action. Received: {}".format(action))

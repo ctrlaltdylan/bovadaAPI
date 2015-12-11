@@ -22,7 +22,7 @@ class BovadaMatch(object):
 
 	@property
 	def match_details(self):
-		return "%s, %s, %s, %s, %s, %s, %s, %s" %(self.sport, self.game_link, 
+		return "{0!s}, {1!s}, {2!s}, {3!s}, {4!s}, {5!s}, {6!s}, {7!s}".format(self.sport, self.game_link, 
 			self.description, self.startTime, self.home_team_full_name,
 			self.game_link, self.type, self.game_id)
 
