@@ -209,12 +209,28 @@ class OutCome(object):
 		self.odds_type = kwargs.pop("odds_type")
 		#H = Home, A = Away, O = Over, U = Under
 		self.outcome_type = kwargs.pop("outcome_type")
-		self.name = kwargs.pop("name")
-		self.odds = kwargs.pop("odds")
-		self.handicap = kwargs.pop("handicap")
-		self.price_id = kwargs.pop("price_id")
-		self.outcome_id = kwargs.pop("outcome_id")
+		try:
+			self.name = kwargs.pop("name")
+		except KeyError:
+			pass
+		try:
+			self.odds = kwargs.pop("odds")
+		except KeyError:
+			pass
+		try:
+			self.handicap = kwargs.pop("handicap")
+		except KeyError:
+			pass
+		try:
+			self.price_id = kwargs.pop("price_id")
+		except KeyError, e:
+			pass
+		try:
+			self.outcome_id = kwargs.pop("outcome_id")
+		except KeyError, e:
+			pass
 		return super(OutCome, self).__init__()
+
 
 	@classmethod
 	def create_from_betting_line(cls, betting_line, *args, **kwargs):
@@ -290,6 +306,7 @@ def parse_special_response(response, action):
 
 	elif action == "open_bets":
 		outstanding_bet_amount = 0
+		total_odds = 0
 		try:
 			items = response.json()["items"]
 		except KeyError, e:
@@ -301,6 +318,11 @@ def parse_special_response(response, action):
 					riskAmount = item["riskAmount"]
 				except KeyError, e:
 					riskAmount = None
+				try:
+					toWinAmount = item["toWinAmount"]
+				except KeyError, e:
+					toWinAmount = 0
+				
 				if riskAmount:
 					try:
 						riskAmount = float(riskAmount)
@@ -309,7 +331,29 @@ def parse_special_response(response, action):
 						riskAmount = riskAmount
 
 					outstanding_bet_amount += riskAmount
-		return "number of outstanding bets: {} outstanding_bet_amount: {}".format(len(items), outstanding_bet_amount)
+				
+				if riskAmount and toWinAmount:
+					odds = (toWinAmount/riskAmount) + 1
+					total_odds += odds
+
+		return (
+			"number of outstanding bets: {}".format(len(items)), 
+			"outstanding_bet_amount: {}".format(outstanding_bet_amount),
+			"avg_odds: {}".format(total_odds/len(items)),
+		)
+
+	elif action == "open_bet_outcome_ids":
+		outcome_ids = []
+		try:
+			items = response.json()["items"]
+		except KeyError, e:
+			items = None
+
+		for item in items:
+			try:
+				outcome_ids.append(item["reference"])
+			except KeyError, e:
+				print e
 
 	elif action == "bet_history":
 		total_profit = 0

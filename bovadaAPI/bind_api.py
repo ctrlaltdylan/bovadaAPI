@@ -43,7 +43,8 @@ def bind_api(auth_obj, action, *args, **kwargs):
 		action=="deposit" or 
 		action=="balance" or
 		action == "bet_history" or
-		action == "open_bets"
+		action == "open_bets" or 
+		action == "open_bet_outcome_ids"
 		):
 
 		headers = get_bovada_headers_authorization(access_token, token_type)
@@ -58,7 +59,8 @@ def bind_api(auth_obj, action, *args, **kwargs):
 				action=="deposit" or 
 				action=="balance" or
 				action == "open_bets" or
-				action == "bet_history"
+				action == "bet_history" or
+				action == "open_bet_outcome_ids"
 				):
 				return parse_special_response(request, action=action)
 			else:
@@ -184,7 +186,7 @@ def get_endpoint(action, profile_id):
 		endpoint = "https://sports.bovada.lv/baseball?json=true"
 	
 
-	elif action == "open_bets":
+	elif action == "open_bets" or action == "open_bet_outcome_ids":
 		endpoint = "https://sports.bovada.lv/services/web/v2/profiles/%s/wagers?status=OPEN&channel=ALL" %profile_id
 
 	elif action == "bet_history":

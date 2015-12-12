@@ -4,9 +4,11 @@
 import os
 from cached_property import cached_property
 from auth import login_to_bovada
+from headers import get_bovada_headers_generic
 from error import BovadaException, BovadaAuthenticationError
 from decorators import authentication_required, authentication_recommended
 from bind_api import bind_api
+from place_bet import PlaceBet
 from search_dictionary_for_certain_keys import search_dictionary_for_certain_keys
 import requests
 import json
@@ -24,7 +26,7 @@ class BovadaApi(object):
 
 	def __init__(self, *args, **kwargs):
 		self._auth = None
-		return super(BovadaApi, self).__init__(*args, **kwargs)
+		super(BovadaApi, self).__init__(*args, **kwargs)
 
 	@property
 	def auth(self):
@@ -47,7 +49,16 @@ class BovadaApi(object):
 			return self._auth
 		
 
-		
+	def __enter__(self, *args, **kwargs):
+		"""authenticate ourselves and return """
+		self.auth
+		self.cookies = self.auth["cookies"]
+		self.headers = get_bovada_headers_generic()
+		return self
+
+	def __exit__(self, *args, **kwargs):
+		pass
+
 	
 	@property
 	@authentication_required
@@ -137,6 +148,34 @@ class BovadaApi(object):
 		"""
 		return bind_api(self, action="baseball_matches")['baseball_matches']
 	
+
+	@authentication_required
+	def place_bet(self, BovadaBet, edge):
+		headers = self.headers
+		cookies = self.cookies
+		odds = BovadaBet.odds
+		edge = edge
+		current_bank_roll = self.balance
+		stake = Kelly.get_stake(
+			odds=odds,
+			edge=edge,
+			current_bank_roll=current_bank_roll
+			)
+		p = PlaceBet()
+		payload = p.build_bet_selection(
+			outcome_id=BovadaBet.outcome_id,
+			price_id=BovadaBet.price_id,
+			stake=stake
+			)
+		if stake > 1:
+			return p.place(data=json.dumps(payload), cookies=cookies, headers=headers)
+
+
+	@property
+	@authentication_required
+	def open_bet_outcome_ids(self):
+		"""returns the outcome ids of the current open bets"""
+		return bind_api(self, action="open_bet_outcome_ids")
 
 
 	
